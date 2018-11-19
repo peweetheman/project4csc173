@@ -53,13 +53,14 @@ TUPLELISTSNAP lookup_SNAP(int id, char* name, char* address, char* phone){
     TUPLELISTSNAP matching = malloc(sizeof (struct SNAP));
     for(int i = 0; i < 1009; i++){
         TUPLELISTSNAP temp = HTSNAP[i];
-
+        int counter = 0;
         while(temp != NULL){
-            printf("temp: %d, %s, %s, %s", temp->StudentId, temp->Name, temp->Address, temp->Phone);
+            counter++;
+            printf("temp: %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
             //(match, match, match, match)
             if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
                 addToSNAPList(temp, matching);
-                printf("poopie bed\n");
+                printf("(m, m, m, m)\n");
             }
 
             //(*, m, m, m) use 00000 as "*" equivalent for integers
@@ -139,7 +140,7 @@ TUPLELISTSNAP lookup_SNAP(int id, char* name, char* address, char* phone){
                 printf("(*, *, *, *)\n");
             }
             temp = temp->next;
-            printf("ending normally?\n");
+            printf("loop ran: %d\n", counter);
         }
     }
 
