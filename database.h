@@ -29,6 +29,11 @@ struct SNAP{
     TUPLELISTSNAP next;
 };
 TUPLELISTSNAP HTSNAP[1009];
+void initializeHTSNAP(){
+    for(int i = 0; i < 1009; i ++){
+        HTSNAP[i] = NULL;
+    }
+}
 
 int hashSNAP(int key){
     return key % 1009;
@@ -44,13 +49,16 @@ void printSNAP(){
     }
 }
 
-void addToSNAPList(TUPLELISTSNAP toAdd, TUPLELISTSNAP main){
-    toAdd->next = main;
-    main = toAdd;
+void printSNAPTUPLEList(TUPLELISTSNAP main){
+    TUPLELISTSNAP temp = main;
+    while(temp != NULL){
+        printf("%d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
+        temp = temp->next;
+    }
 }
 
 TUPLELISTSNAP lookup_SNAP(int id, char* name, char* address, char* phone){
-    TUPLELISTSNAP matching = malloc(sizeof (struct SNAP));
+    TUPLELISTSNAP matching = (TUPLELISTSNAP) calloc(1009, sizeof (TUPLELISTSNAP));
     for(int i = 0; i < 1009; i++){
         TUPLELISTSNAP temp = HTSNAP[i];
         int counter = 0;
@@ -59,84 +67,100 @@ TUPLELISTSNAP lookup_SNAP(int id, char* name, char* address, char* phone){
             printf("temp: %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
             //(match, match, match, match)
             if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
-                addToSNAPList(temp, matching);
+                temp->next = matching;
+                matching = temp;
                 printf("(m, m, m, m)\n");
+                return matching;
             }
 
-            //(*, m, m, m) use 00000 as "*" equivalent for integers
-            if(id == 00000 && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
-                addToSNAPList(temp, matching);
+            //(*, m, m, m) use 0 as "*" equivalent for integers
+            else if(id == 0 && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(*, m, m, m)\n");
             }
             //(m, *, m, m)
-            if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(m, *, m, m)\n");
             }
             //(m, m, *, m)
-            if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(m, m, *, m)\n");
             }
             //(m, m, m, *)
-            if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(m, m, m, *)\n");
             }
             //(*, *, m, m)
-            if(00000 == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(0 == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(*, *, m, m)\n");
             }
             //(*, m, *, m)
-            if(00000 == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(0 == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(*, m, *, m)\n");
             }
             //(m, *, *, m)
-            if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(m, *, *, m)\n");
             }
             //(*, m, m, *)
-            if(00000 == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(0 == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(*, m, m, *)\n");
             }
             //(m, m, *, *)
-            if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(m, m, *, *)\n");
             }
             //(m, *, m, *)
-            if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(m, *, m, *)\n");
             }
             //(*, *, *, m)
-            if(00000 == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
+            else if(0 == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, *, *, m)\n");
             }
             //(*, m, *, *)
-            if(00000 == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(0 == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(*, m, *, *)");
             }
             //(*, *, m, *)
-            if(00000 == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(0 == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(*, *, m, *)\n");
             }
             //(m, *, *, *)
-            if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(m, *, *, *)\n");
             }
             //(*, *, *, *)
-            if(00000 == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
-                addToSNAPList(temp, matching);
+            else if(0 == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
+                temp->next = matching;
+                matching = temp;
                 printf("(*, *, *, *)\n");
             }
             temp = temp->next;
@@ -151,7 +175,7 @@ TUPLELISTSNAP lookup_SNAP(int id, char* name, char* address, char* phone){
 
 //handles collisions as far as I know
 void insert_SNAP(int id, char* name, char* address, char* phone){
-    TUPLELISTSNAP data = malloc(sizeof (struct SNAP));
+    TUPLELISTSNAP data = (TUPLELISTSNAP) malloc(sizeof (struct SNAP));
     data->StudentId = id;
     strcpy(data->Name, name);
     strcpy(data->Address, address);
@@ -160,24 +184,24 @@ void insert_SNAP(int id, char* name, char* address, char* phone){
     int hashIndex = hashSNAP(id);
     if(HTSNAP[hashIndex] == NULL){
         HTSNAP[hashIndex] = data;
-        printf("added empty\n");
+//        printf("added empty\n");
     }
     else{
-        printf("collision\n");
+//        printf("collision\n");
         TUPLELISTSNAP temp = HTSNAP[hashIndex];
 
         while(temp != NULL){
-            printf("temp: %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
+//            printf("temp: %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
             if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
-                printf("duplicate found\n");
+//                printf("duplicate found\n");
                 return;
             }
             temp = temp->next;
-            printf("updating temp\n");
+//            printf("updating temp\n");
         }
         data->next = HTSNAP[hashIndex];
         HTSNAP[hashIndex] = data;
-        printf("added\n");
+//        printf("added\n");
 
     }
 
