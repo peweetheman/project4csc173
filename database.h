@@ -8,7 +8,7 @@
 #endif //PROJECT3CSC173ATTEMPT2_DATABASE_H
 #include <stdio.h>
 #include <malloc.h>
-#include <mem.h>
+#include <string.h>
 
 typedef struct CSG *TUPLELISTCSG;
 struct CSG{
