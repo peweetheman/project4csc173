@@ -42,9 +42,11 @@ int hashSNAP(int key){
 void printSNAP(){
     for(int i = 0; i < 1009; i++){
         TUPLELISTSNAP temp = HTSNAP[i];
+        int index = 0;
         while(temp != NULL){
-            printf("%d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
+            printf("%d, %s, %s, %s, %d\n", temp->StudentId, temp->Name, temp->Address, temp->Phone, index);
             temp = temp->next;
+            index++;
         }
     }
 }
@@ -58,15 +60,21 @@ void printSNAPTUPLEList(TUPLELISTSNAP main){
 }
 
 TUPLELISTSNAP lookup_SNAP(int id, char* name, char* address, char* phone){
-    TUPLELISTSNAP matching = (TUPLELISTSNAP) calloc(1009, sizeof (TUPLELISTSNAP));
+    TUPLELISTSNAP matching = NULL;
+    TUPLELISTSNAP data = (TUPLELISTSNAP) malloc(sizeof (struct SNAP));
+    data->StudentId = id;
+    strcpy(data->Name, name);
+    strcpy(data->Address, address);
+    strcpy(data->Phone, phone);
+    data->next = NULL;
     for(int i = 0; i < 1009; i++){
         TUPLELISTSNAP temp = HTSNAP[i];
         int counter = 0;
         while(temp != NULL){
-            counter++;
+
             printf("temp: %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
             //(match, match, match, match)
-            if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
+            if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(m, m, m, m)\n");
@@ -74,98 +82,101 @@ TUPLELISTSNAP lookup_SNAP(int id, char* name, char* address, char* phone){
             }
 
             //(*, m, m, m) use 0 as "*" equivalent for integers
-            else if(id == 0 && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
+            else if(data->StudentId == 0 && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, m, m, m)\n");
             }
             //(m, *, m, m)
-            else if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
+            else if(temp->StudentId == data->StudentId && strcmp("*", data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(m, *, m, m)\n");
             }
             //(m, m, *, m)
-            else if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
+            else if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(m, m, *, m)\n");
             }
             //(m, m, m, *)
-            else if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
+            else if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp("*", data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(m, m, m, *)\n");
             }
             //(*, *, m, m)
-            else if(0 == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp(temp->Phone, phone) == 0){
+            else if(0 == data->StudentId && strcmp("*", data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, *, m, m)\n");
             }
             //(*, m, *, m)
-            else if(0 == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
+            else if(0 == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, m, *, m)\n");
             }
             //(m, *, *, m)
-            else if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
+            else if(temp->StudentId == data->StudentId && strcmp("*", data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(m, *, *, m)\n");
             }
             //(*, m, m, *)
-            else if(0 == id && strcmp(temp->Name, name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
+            else if(0 == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp("*", data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, m, m, *)\n");
             }
             //(m, m, *, *)
-            else if(temp->StudentId == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
+            else if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp("*", data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(m, m, *, *)\n");
             }
             //(m, *, m, *)
-            else if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
+            else if(temp->StudentId == data->StudentId && strcmp("*", data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp("*", data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(m, *, m, *)\n");
             }
             //(*, *, *, m)
-            else if(0 == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp(temp->Phone, phone) == 0){
+            else if(0 == data->StudentId && strcmp("*", data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, *, *, m)\n");
             }
             //(*, m, *, *)
-            else if(0 == id && strcmp(temp->Name, name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
+            else if(0 == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp("*", data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, m, *, *)");
             }
             //(*, *, m, *)
-            else if(0 == id && strcmp("*", name) == 0 && strcmp(temp->Address, address) == 0 && strcmp("*", phone) == 0){
+            else if(0 == data->StudentId && strcmp("*", data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp("*", data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, *, m, *)\n");
             }
             //(m, *, *, *)
-            else if(temp->StudentId == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
+            else if(temp->StudentId == data->StudentId && strcmp("*", data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp("*", data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(m, *, *, *)\n");
             }
             //(*, *, *, *)
-            else if(0 == id && strcmp("*", name) == 0 && strcmp("*", address) == 0 && strcmp("*", phone) == 0){
+            else if(0 == data->StudentId && strcmp("*", data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp("*", data->Phone) == 0){
                 temp->next = matching;
                 matching = temp;
                 printf("(*, *, *, *)\n");
             }
             temp = temp->next;
+            //printf("Assigning %d, %s, %s, %s to %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
             printf("loop ran: %d\n", counter);
+            counter++;
         }
+
     }
 
 

@@ -12,7 +12,7 @@ void main() {
 
     printSNAP();
     printf("\n");
-    TUPLELISTSNAP matching = lookup_SNAP(0, "C. Brown", "*", "555-1234");
+    TUPLELISTSNAP matching = lookup_SNAP(12345, "C. Brown", "*", "555-1234");
     printf("\nprinting matching:\n");
     printSNAPTUPLEList(matching);
     free(HTSNAP);
