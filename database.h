@@ -19,7 +19,6 @@ struct CSG{
 };
 TUPLELISTCSG HTCSG[1009];
 
-
 typedef struct SNAP *TUPLELISTSNAP;
 struct SNAP{
     int StudentId;
@@ -29,12 +28,33 @@ struct SNAP{
     TUPLELISTSNAP next;
 };
 TUPLELISTSNAP HTSNAP[1009];
-void initializeHTSNAP(){
-    for(int i = 0; i < 1009; i ++){
-        HTSNAP[i] = NULL;
-    }
-}
 
+typedef struct CP *TUPLELISTCP;
+struct CP{
+    char Course[5];
+    char PrereqCourse[5];
+    TUPLELISTCP next;
+};
+typedef TUPLELISTCP HTCP[1009];
+
+typedef struct CDH *TUPLELISTCDH;
+struct CDH{
+    char Course[5];
+    char Day[2];
+    char Hour[4];
+    TUPLELISTCDH next;
+};
+typedef TUPLELISTCDH HTCDH[1009];
+
+typedef struct CR *TUPLELISTCR;
+struct CR{
+    char Course[5];
+    char Room[30];
+    TUPLELISTCR next;
+};
+typedef TUPLELISTCR HTCR[1009];
+
+//key is student id
 int hashSNAP(int key){
     return key % 1009;
 }
@@ -57,131 +77,37 @@ void printSNAPTUPLEList(TUPLELISTSNAP main){
         printf("%d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
         temp = temp->next;
     }
+    printf("\n");
 }
 
+
 TUPLELISTSNAP lookup_SNAP(int id, char* name, char* address, char* phone){
-    TUPLELISTSNAP matching = NULL;
-    TUPLELISTSNAP data = (TUPLELISTSNAP) malloc(sizeof (struct SNAP));
-    data->StudentId = id;
-    strcpy(data->Name, name);
-    strcpy(data->Address, address);
-    strcpy(data->Phone, phone);
-    data->next = NULL;
-    for(int i = 0; i < 1009; i++){
+    TUPLELISTSNAP firstNode = NULL;
+    TUPLELISTSNAP matching;
+    for(int i = 0; i < 1009; i++) {
         TUPLELISTSNAP temp = HTSNAP[i];
-        int counter = 0;
-        while(temp != NULL){
-
-            printf("temp: %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
-            //(match, match, match, match)
-            if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(m, m, m, m)\n");
-                return matching;
-            }
-
-            //(*, m, m, m) use 0 as "*" equivalent for integers
-            else if(data->StudentId == 0 && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(*, m, m, m)\n");
-            }
-            //(m, *, m, m)
-            else if(temp->StudentId == data->StudentId && strcmp("*", data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(m, *, m, m)\n");
-            }
-            //(m, m, *, m)
-            else if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(m, m, *, m)\n");
-            }
-            //(m, m, m, *)
-            else if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp("*", data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(m, m, m, *)\n");
-            }
-            //(*, *, m, m)
-            else if(0 == data->StudentId && strcmp("*", data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(*, *, m, m)\n");
-            }
-            //(*, m, *, m)
-            else if(0 == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(*, m, *, m)\n");
-            }
-            //(m, *, *, m)
-            else if(temp->StudentId == data->StudentId && strcmp("*", data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(m, *, *, m)\n");
-            }
-            //(*, m, m, *)
-            else if(0 == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp("*", data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(*, m, m, *)\n");
-            }
-            //(m, m, *, *)
-            else if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp("*", data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(m, m, *, *)\n");
-            }
-            //(m, *, m, *)
-            else if(temp->StudentId == data->StudentId && strcmp("*", data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp("*", data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(m, *, m, *)\n");
-            }
-            //(*, *, *, m)
-            else if(0 == data->StudentId && strcmp("*", data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(*, *, *, m)\n");
-            }
-            //(*, m, *, *)
-            else if(0 == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp("*", data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(*, m, *, *)");
-            }
-            //(*, *, m, *)
-            else if(0 == data->StudentId && strcmp("*", data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp("*", data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(*, *, m, *)\n");
-            }
-            //(m, *, *, *)
-            else if(temp->StudentId == data->StudentId && strcmp("*", data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp("*", data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(m, *, *, *)\n");
-            }
-            //(*, *, *, *)
-            else if(0 == data->StudentId && strcmp("*", data->Name) == 0 && strcmp("*", data->Address) == 0 && strcmp("*", data->Phone) == 0){
-                temp->next = matching;
-                matching = temp;
-                printf("(*, *, *, *)\n");
+        while (temp != NULL) {
+            if ((id == 0 || id == temp->StudentId)
+                && (strcmp(temp->Name, name) == 0 || strcmp("*", name) == 0)
+                && (strcmp(temp->Address, address) == 0 || strcmp("*", address) == 0)
+                && (strcmp(temp->Phone, phone) == 0 || strcmp("*", phone) == 0)) {
+                TUPLELISTSNAP temp2 = temp;
+                temp2->StudentId = temp->StudentId;
+                strcpy(temp2->Name, temp->Name);
+                strcpy(temp2->Address, temp->Address);
+                strcpy(temp2->Phone, temp->Phone);
+                if (firstNode == NULL) {
+                    firstNode = temp2;
+                    matching = firstNode;
+                } else {
+                    matching->next = temp2;
+                    matching = matching->next;
+                }
             }
             temp = temp->next;
-            //printf("Assigning %d, %s, %s, %s to %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
-            printf("loop ran: %d\n", counter);
-            counter++;
         }
-
     }
-
-
-
-    return matching;
+    return firstNode;
 }
 
 //handles collisions as far as I know
@@ -200,7 +126,6 @@ void insert_SNAP(int id, char* name, char* address, char* phone){
     else{
 //        printf("collision\n");
         TUPLELISTSNAP temp = HTSNAP[hashIndex];
-
         while(temp != NULL){
 //            printf("temp: %d, %s, %s, %s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
             if(temp->StudentId == data->StudentId && strcmp(temp->Name, data->Name) == 0 && strcmp(temp->Address, data->Address) == 0 && strcmp(temp->Phone, data->Phone) == 0){
@@ -213,7 +138,5 @@ void insert_SNAP(int id, char* name, char* address, char* phone){
         data->next = HTSNAP[hashIndex];
         HTSNAP[hashIndex] = data;
 //        printf("added\n");
-
     }
-
 }
