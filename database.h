@@ -31,26 +31,26 @@ TUPLELISTSNAP HTSNAP[1009];
 
 typedef struct CP *TUPLELISTCP;
 struct CP{
-    char Course[5];
+    char Course[6];
     int doesAbsolutelyNothing;
-    char PrereqCourse[5];
+    char PrereqCourse[6];
     TUPLELISTCP next;
 };
 TUPLELISTCP HTCP[128];
 
 typedef struct CDH *TUPLELISTCDH;
 struct CDH{
-    char Course[5];
-    char Day[2];
+    char Course[6];
+    char Day[3];
     int doesAbsolutelyNothing;
-    char Hour[4];
+    char Hour[5];
     TUPLELISTCDH next;
 };
 TUPLELISTCDH HTCDH[128];
 
 typedef struct CR *TUPLELISTCR;
 struct CR{
-    char Course[5];
+    char Course[6];
     int doesAbsolutelyNothing;
     char Room[30];
     TUPLELISTCR next;
@@ -69,11 +69,12 @@ int hashCR(char* course){
 }
 
 void printCR(){
-    for(int i = 0; i < 1009; i++){
+    for(int i = 0; i < 128; i++){
+
         TUPLELISTCR temp = HTCR[i];
         int index = 0;
         while(temp != NULL){
-            printf("%s, %s, %d\n", temp->Course, temp->Room, index);
+            printf("%s, %s \n", temp->Course, temp->Room);
             temp = temp->next;
             index++;
         }
@@ -92,8 +93,8 @@ void printCRTUPLEList(TUPLELISTCR main){
 
 TUPLELISTCR lookup_CR(char* course, char* room){
     TUPLELISTCR firstNode = NULL;
-    TUPLELISTCR matching;
-    for(int i = 0; i < 1009; i++) {
+    TUPLELISTCR matching = (TUPLELISTCR) malloc (sizeof(struct CR));
+    for(int i = 0; i < 128; i++) {
         TUPLELISTCR temp = HTCR[i];
         while (temp != NULL) {
             if ((strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
@@ -118,9 +119,8 @@ TUPLELISTCR lookup_CR(char* course, char* room){
 
 
 //handles collisions as far as I know
-void insert_CR(char* course, char* room, int doNothing){
+void insert_CR(char* course, char* room){
     TUPLELISTCR data = (TUPLELISTCR) malloc(sizeof (struct CR));
-    data->doesAbsolutelyNothing = doNothing;
     strcpy(data->Course, course);
     strcpy(data->Room, room);
     data->next = NULL;
@@ -147,6 +147,22 @@ void insert_CR(char* course, char* room, int doNothing){
     }
 }
 
+void delete_CR(char* course, char* room){
+    for(int i = 0; i < 128; i++) {
+        TUPLELISTCR temp = HTCR[i];
+        while (temp != NULL) {
+            if ((strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
+                && (strcmp(temp->Room, room) == 0 || strcmp("*", room) == 0)) {
+                strcpy(temp->Course, temp->next->Course);
+                strcpy(temp->Room, temp->next->Room);
+                temp->next = temp->next->next;
+            }
+            else{
+                temp = temp->next;
+            }
+        }
+    }
+}
 
 
 
@@ -163,11 +179,11 @@ int hashCSG(char* course){
 }
 
 void printCSG(){
-    for(int i = 0; i < 1009; i++){
+    for(int i = 0; i < 128; i++){
         TUPLELISTCSG temp = HTCSG[i];
         int index = 0;
         while(temp != NULL){
-            printf("%s, %d, %s, %d\n", temp->Course, temp->StudentId, temp->Grade, index);
+            printf("%s, %d, %s \n", temp->Course, temp->StudentId, temp->Grade);
             temp = temp->next;
             index++;
         }
@@ -186,8 +202,8 @@ void printCSGTUPLEList(TUPLELISTCSG main){
 
 TUPLELISTCSG lookup_CSG(char* course, int id, char* grade){
     TUPLELISTCSG firstNode = NULL;
-    TUPLELISTCSG matching;
-    for(int i = 0; i < 1009; i++) {
+    TUPLELISTCSG matching = (TUPLELISTCSG) malloc(sizeof(struct CSG));
+    for(int i = 0; i < 128; i++) {
         TUPLELISTCSG temp = HTCSG[i];
         while (temp != NULL) {
             if ((id == 0 || id == temp->StudentId)
@@ -257,7 +273,7 @@ void printSNAP(){
         TUPLELISTSNAP temp = HTSNAP[i];
         int index = 0;
         while(temp != NULL){
-            printf("%d, %s, %s, %s, %d\n", temp->StudentId, temp->Name, temp->Address, temp->Phone, index);
+            printf("%d, %s, %s, %s \n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
             temp = temp->next;
             index++;
         }
@@ -350,11 +366,11 @@ int hashCP(char* course){
 }
 
 void printCP(){
-    for(int i = 0; i < 1009; i++){
+    for(int i = 0; i < 128; i++){
         TUPLELISTCP temp = HTCP[i];
         int index = 0;
         while(temp != NULL){
-            printf("%s, %s, %d\n", temp->Course, temp->PrereqCourse, index);
+            printf("%s, %s \n", temp->Course, temp->PrereqCourse);
             temp = temp->next;
             index++;
         }
@@ -373,15 +389,16 @@ void printCPTUPLEList(TUPLELISTCP main){
 
 TUPLELISTCP lookup_CP(char* course, char* pre){
     TUPLELISTCP firstNode = NULL;
-    TUPLELISTCP matching;
-    for(int i = 0; i < 1009; i++) {
+    TUPLELISTCP matching = (TUPLELISTCP) malloc(sizeof(struct CP));
+    for(int i = 0; i < 128; i++) {
         TUPLELISTCP temp = HTCP[i];
         while (temp != NULL) {
             if ((strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
                 && (strcmp(temp->PrereqCourse, pre) == 0 || strcmp("*", pre) == 0)) {
-                TUPLELISTCP temp2 = temp;
+                TUPLELISTCP temp2 = (TUPLELISTCP) malloc(sizeof(struct CP));
                 strcpy(temp2->Course, temp->Course);
                 strcpy(temp2->PrereqCourse, temp->PrereqCourse);
+                temp2->next = NULL;
                 if (firstNode == NULL) {
                     firstNode = temp2;
                     matching = firstNode;
@@ -399,9 +416,8 @@ TUPLELISTCP lookup_CP(char* course, char* pre){
 
 
 //handles collisions as far as I know
-void insert_CP(char* course, char* pre, int doNothing){
+void insert_CP(char* course, char* pre){
     TUPLELISTCP data = (TUPLELISTCP) malloc(sizeof (struct CP));
-    data->doesAbsolutelyNothing = doNothing;
     strcpy(data->Course, course);
     strcpy(data->PrereqCourse, pre);
     data->next = NULL;
@@ -439,11 +455,11 @@ int hashCDH(char* course){
 }
 
 void printCDH(){
-    for(int i = 0; i < 1009; i++){
+    for(int i = 0; i < 128; i++){
         TUPLELISTCDH temp = HTCDH[i];
         int index = 0;
         while(temp != NULL){
-            printf("%s, %s, %s, %d\n", temp->Course, temp->Day, temp->Hour, index);
+            printf("%s, %s, %s \n", temp->Course, temp->Day, temp->Hour);
             temp = temp->next;
             index++;
         }
@@ -453,7 +469,7 @@ void printCDH(){
 void printCDHTUPLEList(TUPLELISTCDH main){
     TUPLELISTCDH temp = main;
     while(temp != NULL){
-        printf("%s, %d, %s\n", temp->Course, temp->Day, temp->Hour);
+        printf("%s, %s, %s\n", temp->Course, temp->Day, temp->Hour);
         temp = temp->next;
     }
     printf("\n");
@@ -462,8 +478,8 @@ void printCDHTUPLEList(TUPLELISTCDH main){
 
 TUPLELISTCDH lookup_CDH(char* course, char* day, char* hour){
     TUPLELISTCDH firstNode = NULL;
-    TUPLELISTCDH matching;
-    for(int i = 0; i < 1009; i++) {
+    TUPLELISTCDH matching = (TUPLELISTCDH) malloc(sizeof(struct CDH));
+    for(int i = 0; i < 128; i++) {
         TUPLELISTCDH temp = HTCDH[i];
         while (temp != NULL) {
             if ((strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
@@ -488,9 +504,9 @@ TUPLELISTCDH lookup_CDH(char* course, char* day, char* hour){
 }
 
 //CONCANTENATION ISSUE THAT CAN'T BE SOLVED WITH THE CD TRICK
-void insert_CDH(char* course, char* day, char* hour, int doNothing){
+void insert_CDH(char* course, char* day, char hour[]){
     TUPLELISTCDH data = (TUPLELISTCDH) malloc(sizeof (struct CDH));
-    data->doesAbsolutelyNothing = doNothing;
+ //   data->doesAbsolutelyNothing = doNothing;
     strcpy(data->Course, course);
     strcpy(data->Day, day);
     strcpy(data->Hour, hour);
