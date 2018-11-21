@@ -1,6 +1,53 @@
 #include <stdio.h>
 #include "database.h"
 
+
+void REPL(){
+    printf("\nQuery of 'What GRADE did STUDENTNAME get in COURSENAME' \n");
+
+    char* studentName = malloc(20*sizeof(char));
+    printf("Enter the Student's Name: ");
+    scanf(" %[^\n]s",studentName);
+
+    char* courseName = malloc(10*sizeof(char));
+    printf("Enter the Course Name: ");
+    scanf(" %[^\n]s",courseName);
+
+    getGrade(studentName, courseName);
+    printf("Enter 1 to continue this REPL or anything else to move on: ");
+    char check[100];
+    scanf(" %[^\n]s",check);
+    if(strcmp(check, "1") == 0){
+        REPL();
+    }
+}
+
+void REPL2(){
+    printf("\nQuery of 'Where(what ROOM) is STUDENTNAME at TIME on DAY' \n");
+
+    char* studentName = malloc(20*sizeof(char));
+    printf("Enter the Student's Name: ");
+    scanf(" %[^\n]s",studentName);
+
+    char* time = malloc(10*sizeof(char));
+    printf("Enter the time: ");
+    scanf(" %[^\n]s",time);
+
+    char* day = malloc(10*sizeof(char));
+    printf("Enter the initials of the day: ");
+    scanf(" %[^\n]s",day);
+
+    getRoom(studentName, time, day);
+
+    printf("Enter 1 to continue this REPL or anything else to move on: ");
+    char check[100];
+    scanf(" %[^\n]s",check);
+    if(strcmp(check, "1") == 0){
+        REPL();
+    }
+
+}
+
 int main() {
     TUPLELISTSNAP HTSNAP = malloc(sizeof (struct SNAP) * 1009);
     printf("NOW SHOWING S-N-A-P relation: \n");
@@ -89,17 +136,23 @@ int main() {
     insert_CR("EE200", "25 Ohm Hall");
     insert_CR("PH100", "Newton Lab.");
     insert_CR("PH100", "Newton Lab.");
-    insert_CR("CS101", "DELETE ME ROOM");
     printCR();
 
     printf("\nlookup function of \"CS101\", \"Turing Aud.\": \n");
     TUPLELISTCR matching2 = lookup_CR("CS101", "Turing Aud.");
     printCRTUPLEList(matching2);
 
-    printf("Deleting \"CS101\", \"DELETE ME ROOM\": \n");
-    delete_CR("CS101", "DELETE ME ROOM");
+    printf("Deleting \"CS101\", \"Turing Aud.\" and printing remaining: \n");
+    delete_CR("CS101", "Turing Aud.");
     printCR();
 
+    insert_CR("CS101", "Turing Aud."); //ADDING BACK FOR PART 2
 
-   return 0;
+
+    //PART TWO!!!
+    printf("\n\n\n NOW TESTING PART TWO REPL \n");
+    REPL();
+    REPL2();
+
+    return 0;
 }

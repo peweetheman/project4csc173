@@ -153,9 +153,17 @@ void delete_CR(char* course, char* room){
         while (temp != NULL) {
             if ((strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
                 && (strcmp(temp->Room, room) == 0 || strcmp("*", room) == 0)) {
-                strcpy(temp->Course, temp->next->Course);
-                strcpy(temp->Room, temp->next->Room);
-                temp->next = temp->next->next;
+                if(temp->next == NULL){
+                    free(temp->Course);
+                    free(temp->Room);
+                    temp=NULL;
+                    HTCR[i] = NULL;
+                }
+                else {
+                    strcpy(temp->Course, temp->next->Course);
+                    strcpy(temp->Room, temp->next->Room);
+                    temp->next = temp->next->next;
+                }
             }
             else{
                 temp = temp->next;
@@ -531,5 +539,50 @@ void insert_CDH(char* course, char* day, char hour[]){
         data->next = HTCDH[hashIndex];
         HTCDH[hashIndex] = data;
 //        printf("added\n");
+    }
+}
+
+//PART TWO FUNCTIONS!!
+
+void getGrade(char* studentName, char* courseName){
+    int check = 0;
+    TUPLELISTSNAP possibleTuple = lookup_SNAP(0, studentName, "*", "*");
+
+    while(possibleTuple != NULL) {
+        TUPLELISTCSG possibleCSG = lookup_CSG(courseName, possibleTuple->StudentId, "*");
+        if(possibleCSG!= NULL){
+            check = 1;
+            printf("%s got a grade of %s in the course %s \n", studentName, possibleCSG->Grade, courseName);
+        }
+        possibleTuple = possibleTuple->next;
+    }
+    if (check ==0){
+        printf("It doesn't look like %s took the course %s \n", studentName, courseName);
+    }
+}
+
+void getRoom(char* studentName, char* time, char* day){
+
+    int check = 0;
+    TUPLELISTSNAP possibleSNAP = lookup_SNAP(0, studentName, "*", "*");
+
+    while(possibleSNAP != NULL) {
+        TUPLELISTCSG possibleCSG = lookup_CSG("*", possibleSNAP->StudentId, "*");
+        while(possibleCSG!= NULL){
+            TUPLELISTCDH possibleCDH = lookup_CDH(possibleCSG->Course, day, time);
+            while(possibleCDH!=NULL){
+                TUPLELISTCR possibleCR = lookup_CR(possibleCDH->Course, "*");
+                if(possibleCR!=NULL){
+                    check =1;
+                    printf("%s is in %s at %s on %s \n", studentName, possibleCR->Room, time, day);
+                }
+                possibleCDH = possibleCDH->next;
+            }
+            possibleCSG = possibleCSG->next;
+        }
+        possibleSNAP = possibleSNAP->next;
+    }
+    if (check ==0){
+        printf("It doesn't look like we have that information \n");
     }
 }
