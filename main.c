@@ -178,25 +178,27 @@ int main() {
 //    return 0;
 
     RealSQL * SQL= sqlinit();
-    //printf("%s", SQL->root);
     attributes * a = attrInit("studentid");
     appendAttribute(a, "name");
     appendAttribute(a, "room");
     appendAttribute(a, "grade");
-    //printAttributes(a);
     createTable(SQL,"Students",a);
-    printf("%s\n",SQL->root->name);
-    printAttributes(SQL->root->attributes);
-
+//   printf("%s\n",SQL->root->name);
+//    printAttributes(SQL->root->attributes);
+    printSQLschema(SQL);
+    printf("\n");
     attributes * b = attrInit("fuckid");
     appendAttribute(b, "name");
     appendAttribute(b, "room");
     appendAttribute(b, "grade");
     createTable(SQL,"fuck",a);
-    printf("%s\n",SQL->root->nextTable->name);
-    printAttributes(SQL->root->nextTable->attributes);
-
+//    printf("%s\n",SQL->root->nextTable->name);
+//    printAttributes(SQL->root->nextTable->attributes);
+    printSQLschema(SQL);
+    printf("\n");
     createTable(SQL,"Ssdafds",b);
-//    printf("%s\n",SQL->root->nextTable->nextTable->name);
-//    printAttributes(SQL->root->nextTable->nextTable->attributes);
+    printSQLschema(SQL);
+    printf("\n");
+    createTable(SQL,"suck my balls",a);
+       printSQLschema(SQL);
 }

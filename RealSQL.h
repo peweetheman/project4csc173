@@ -97,29 +97,39 @@ bool createTable(RealSQL * SQL, char * name, attributes * attributes){
         printf("Existed");
         return 0;
     }
+
     Table * t = malloc(sizeof(Table));
     t->name=name;
     t->attributes=attributes;
     t->nextTable=NULL;
+
     for (int i = 0; i < 1009; i++) {
         t->data[i]=malloc(sizeof(node));
     }
-    printf("created\n");
+    //printf("created\n");
     if(SQL->root==NULL){
         SQL->root=t;
     }else{
-       // Table * temp=SQL->root;
+        Table * temp=SQL->root;
         while(SQL->root->nextTable!=NULL){
             SQL->root=SQL->root->nextTable;
         }
         SQL->root->nextTable=t;
-        printf("done\n");
+        SQL->root=temp;
     }
 
     return 1;
 };
 
-
+void printSQLschema(RealSQL * SQL){
+    Table * temp=SQL->root;
+    do{
+          printf("%s\n",SQL->root->name);
+          printAttributes(SQL->root->attributes);
+          SQL->root=SQL->root->nextTable;
+    }while(SQL->root!=NULL);
+    SQL->root=temp;
+};
 
 //insert into the table
 bool insertIntoTable(RealSQL * SQL, char * tableName, node * data){
