@@ -10,6 +10,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 
 typedef struct attributes{
@@ -22,6 +23,7 @@ attributes * attrInit(char * attr){
     attributes * a = malloc(sizeof(attributes));
     a->attr=attr;
     a->next=NULL;
+    return a;
 }
 
 void appendAttribute(attributes * head, char * attr){
@@ -139,8 +141,15 @@ node * nodeInit(char * Tablename, char * firstVal){
 };
 
 int getHashid(char * firstVal){
-    char * result="";
-
+    char result[50]="";
+    for (int i =0; i< sizeof(firstVal)/sizeof(char); i++){
+        int num = firstVal[i]-'(';
+        char snum[50];
+        //printf("%s\n",itoa(num, snum, 10));
+        strcpy(result,strcat(result,itoa(num, snum, 10)));
+        printf("%s\n",result);
+    }
+    return atoi(result);
 }
 
 void appendElement(node* node, char * data){
@@ -149,7 +158,6 @@ void appendElement(node* node, char * data){
 
 //insert into the table
 //0: the table doesn't exist
-
 int insertIntoTable(RealSQL * SQL, char * tableName, node * data){
     if(tableExist(SQL,tableName)==1){
 

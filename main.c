@@ -193,4 +193,6 @@ int main() {
     createTable(SQL,"Ssdafds",b);
     createTable(SQL,"suck my balls",a);
        printSQLschema(SQL);
+
+       printf("%d",getHashid("helo"));
 }
