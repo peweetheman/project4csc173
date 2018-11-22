@@ -35,23 +35,25 @@ void appendAttribute(attributes * head, char * attr){
 
 void printAttributes(attributes * attr){
     do{
-        printf("%s  ",attr->attr);
+        printf("%s\t",attr->attr);
         attr=attr->next;
     }while(attr!=NULL);
     printf("\n");
 };
 
 typedef struct element{
-    char name[50];
-    char value[50];
+    char * name;
+    char * value;
     struct element * nextElement;
 }element;
 
 //a entity of data
 typedef struct node{
     int hashId;
-    struct element head;
+    struct element * head;
     struct node * nextNode;
+    int properWidth;
+    struct attributes * attributes;
 }node;
 
 typedef struct Table{
@@ -124,14 +126,38 @@ bool createTable(RealSQL * SQL, char * name, attributes * attributes){
 void printSQLschema(RealSQL * SQL){
     Table * temp=SQL->root;
     do{
-          printf("%s\n",SQL->root->name);
+          printf("Name of the Table: %s\n",SQL->root->name);
           printAttributes(SQL->root->attributes);
           SQL->root=SQL->root->nextTable;
     }while(SQL->root!=NULL);
     SQL->root=temp;
 };
 
-//insert into the table
-bool insertIntoTable(RealSQL * SQL, char * tableName, node * data){
+node * nodeInit(char * Tablename, char * firstVal){
+    node * n = malloc(sizeof(node));
 
 };
+
+int getHashid(char * firstVal){
+    char * result="";
+
+}
+
+void appendElement(node* node, char * data){
+
+};
+
+//insert into the table
+//0: the table doesn't exist
+
+int insertIntoTable(RealSQL * SQL, char * tableName, node * data){
+    if(tableExist(SQL,tableName)==1){
+
+
+    }else{
+        //the table doesn't exist
+        return 0;
+    }
+};
+
+

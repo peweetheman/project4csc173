@@ -183,10 +183,6 @@ int main() {
     appendAttribute(a, "room");
     appendAttribute(a, "grade");
     createTable(SQL,"Students",a);
-//   printf("%s\n",SQL->root->name);
-//    printAttributes(SQL->root->attributes);
-    printSQLschema(SQL);
-    printf("\n");
     attributes * b = attrInit("fuckid");
     appendAttribute(b, "name");
     appendAttribute(b, "room");
@@ -194,11 +190,7 @@ int main() {
     createTable(SQL,"fuck",a);
 //    printf("%s\n",SQL->root->nextTable->name);
 //    printAttributes(SQL->root->nextTable->attributes);
-    printSQLschema(SQL);
-    printf("\n");
     createTable(SQL,"Ssdafds",b);
-    printSQLschema(SQL);
-    printf("\n");
     createTable(SQL,"suck my balls",a);
        printSQLschema(SQL);
 }
