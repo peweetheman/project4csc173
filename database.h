@@ -32,7 +32,6 @@ TUPLELISTSNAP HTSNAP[1009];
 typedef struct CP *TUPLELISTCP;
 struct CP{
     char Course[6];
-    int doesAbsolutelyNothing;
     char PrereqCourse[6];
     TUPLELISTCP next;
 };
@@ -42,7 +41,6 @@ typedef struct CDH *TUPLELISTCDH;
 struct CDH{
     char Course[6];
     char Day[3];
-    int doesAbsolutelyNothing;
     char Hour[5];
     TUPLELISTCDH next;
 };
@@ -51,14 +49,32 @@ TUPLELISTCDH HTCDH[128];
 typedef struct CR *TUPLELISTCR;
 struct CR{
     char Course[6];
-    int doesAbsolutelyNothing;
     char Room[30];
     TUPLELISTCR next;
 };
 TUPLELISTCR HTCR[128];
 
+typedef struct id *TUPLELISTid;
+struct id{
+    int id;
+    TUPLELISTid next;
+};
 
+typedef struct CRDH *TUPLELISTCRDH;
+struct CRDH{
+    char Course[6];
+    char Room[30];
+    char Day[3];
+    char Hour[5];
+    TUPLELISTCRDH next;
+};
 
+typedef struct DH *TUPLELISTDH;
+struct DH{
+    char Day[3];
+    char Hour[5];
+    TUPLELISTDH next;
+};
 //key is Course
 int hashCR(char* course){
     int ascii = 0;
@@ -207,7 +223,6 @@ void printCSGTUPLEList(TUPLELISTCSG main){
     printf("\n");
 }
 
-
 TUPLELISTCSG lookup_CSG(char* course, int id, char* grade){
     TUPLELISTCSG firstNode = NULL;
     TUPLELISTCSG matching = (TUPLELISTCSG) malloc(sizeof(struct CSG));
@@ -234,6 +249,7 @@ TUPLELISTCSG lookup_CSG(char* course, int id, char* grade){
     }
     return firstNode;
 }
+
 
 //handles collisions as far as I know
 void insert_CSG(char* course, int id, char* grade){
@@ -585,4 +601,125 @@ void getRoom(char* studentName, char* time, char* day){
     if (check ==0){
         printf("It doesn't look like we have that information \n");
     }
+}
+
+//Part iii methods
+
+TUPLELISTCSG select_CSG(char* course, int id, char* grade){ // for part iii
+    TUPLELISTCSG stuff = (lookup_CSG(course, id, grade));
+    return stuff;
+}
+
+TUPLELISTid project_CSG(TUPLELISTCSG CSG){
+    TUPLELISTid firstID = (TUPLELISTid) malloc(sizeof(TUPLELISTCSG));
+    TUPLELISTid temp1 = firstID;
+    while(CSG!=NULL){
+        temp1->id = CSG->StudentId;
+        TUPLELISTid temp2 = (TUPLELISTid) malloc(sizeof(TUPLELISTCSG));
+        CSG = CSG->next;
+        if(CSG!=NULL){
+            temp1->next = temp2;
+            temp2->next = NULL;
+            temp1 = temp2;
+        }
+    }
+
+    return firstID;
+}
+
+
+void printID(TUPLELISTid id){
+    TUPLELISTid temp = id;
+    while(temp != NULL){
+        printf("%d \n", temp->id);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+void printCRDHTUPLELIST(TUPLELISTCRDH main){
+    TUPLELISTCRDH temp = main;
+    while(temp != NULL){
+        printf("%s, %s, %s, %s \n", temp->Course, temp->Room, temp->Day, temp->Hour);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+void printDH(TUPLELISTDH main){
+    TUPLELISTDH temp = main;
+    while(temp != NULL){
+        printf("%s, %s \n", temp->Day, temp->Hour);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+TUPLELISTCRDH select_CRDH(char* room, TUPLELISTCRDH crdh){ // for part iii
+    TUPLELISTCRDH first = NULL;
+    TUPLELISTCRDH temp1 = malloc(2*sizeof(struct CRDH));
+    while(crdh!=NULL){
+        if ((strcmp(crdh->Room, room) == 0)) {
+            TUPLELISTCRDH temp2 = malloc(2*sizeof(struct CRDH));
+            strcpy(temp2->Room, crdh->Room);
+            strcpy(temp2->Course, crdh->Course);
+            strcpy(temp2->Day, crdh->Day);
+            strcpy(temp2->Hour, crdh->Hour);
+            if (first == NULL) {
+                first = temp2;
+                temp1 = temp2;
+            } else {
+                temp1->next = temp2;
+                temp1 = temp2;
+            }
+        }
+        crdh = crdh->next;
+    }
+    return first;
+}
+
+TUPLELISTCRDH join_CR_CDH(TUPLELISTCR cr, TUPLELISTCDH cdh){
+    TUPLELISTCRDH firstCRDH = NULL;
+    TUPLELISTCDH cdhorg = cdh;
+    TUPLELISTCRDH temp2 = (TUPLELISTCRDH) malloc(30*sizeof(cdh));
+    while(cr!=NULL){
+        while(cdh!=NULL) {
+            if(strcmp(cdh->Course, cr->Course) ==0){
+                TUPLELISTCRDH temp1 = (TUPLELISTCRDH) malloc(30*sizeof(cdh));
+                strcpy(temp1->Course, cdh->Course);
+                strcpy(temp1->Hour, cdh->Hour);
+                strcpy(temp1->Day, cdh->Day);
+                strcpy(temp1->Room, cr->Room);
+                if(firstCRDH == NULL){
+                    firstCRDH = temp1;
+                    temp2 = temp1;
+                }
+                else{
+                    temp2->next = temp1;
+                    temp2 = temp1;
+                }
+            }
+            cdh = cdh->next;
+        }
+        cdh = cdhorg;
+        cr = cr->next;
+    }
+    return firstCRDH;
+}
+
+TUPLELISTDH project_CRDH(TUPLELISTCRDH crdh){
+    TUPLELISTDH first = (TUPLELISTDH) malloc(5*sizeof(TUPLELISTCRDH));
+    TUPLELISTDH temp1 = first;
+    while(crdh!=NULL){
+        strcpy(temp1->Hour, crdh->Hour);
+        strcpy(temp1->Day, crdh->Day);
+        TUPLELISTDH temp2 = (TUPLELISTDH) malloc(5*sizeof(TUPLELISTCRDH));
+        crdh = crdh->next;
+        if(crdh!=NULL){
+            temp1->next = temp2;
+            temp2->next = NULL;
+            temp1 = temp2;
+        }
+        else{
+        }
+    }
+    return first;
 }

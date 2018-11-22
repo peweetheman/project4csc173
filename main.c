@@ -103,7 +103,7 @@ int main() {
     insert_CP("CS205", "CS120");
     insert_CP("CS205", "CS101");
 
-    printf("lookup function on \"CS205\", \"CS120\" AFTER INSERTING IT:");
+    printf("lookup function on \"CS205\", \"CS120\" AFTER INSERTING IT: \n");
     TUPLELISTCP textbookTest2 = lookup_CP("CS205", "CS120");
     printCPTUPLEList(textbookTest2);
 
@@ -151,8 +151,28 @@ int main() {
 
     //PART TWO!!!
     printf("\n\n\n NOW TESTING PART TWO REPL \n");
-    REPL();
-    REPL2();
+//    REPL();
+//    REPL2();
 
+    //PART THREE!!!!!
+    printf("\n\n NOW TESTING PART THREE \n");
+    printf("printing SELECT course='CS101' on CSG: \n");
+    TUPLELISTCSG selectedTuples = select_CSG("CS101", 0, "*");
+    printCSGTUPLEList(selectedTuples);
+
+    printf("printing PROJECT 'studentID' of SELECT course='CS101' of CSG:\n");
+    TUPLELISTid id = project_CSG(selectedTuples);
+    printID(id);
+
+    TUPLELISTCR cr = lookup_CR("*", "*");
+    TUPLELISTCDH cdh = lookup_CDH("*", "*", "*");
+    printf("printing JOIN of CR and CDH on Course:\n");
+    TUPLELISTCRDH crdh = join_CR_CDH(cr, cdh);
+    printCRDHTUPLELIST(crdh);
+
+    printf("printing PROJECT 'day, hour' of SELECT 'Turing Aud.' of JOIN of CR and CDH on Course: \n");
+    TUPLELISTCRDH crdh2 = select_CRDH("Turing Aud.", crdh);
+    TUPLELISTDH dh = project_CRDH(crdh2);
+    printDH(dh);
     return 0;
 }
