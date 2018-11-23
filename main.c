@@ -182,6 +182,7 @@ int main() {
     appendAttribute(a, "name");
     appendAttribute(a, "room");
     appendAttribute(a, "grade");
+    appendAttribute(a, "numOfPeopleFucked");
     createTable(SQL,"Students",a);
     attributes * b = attrInit("fuckid");
     appendAttribute(b, "name");
@@ -192,7 +193,33 @@ int main() {
 //    printAttributes(SQL->root->nextTable->attributes);
     createTable(SQL,"Ssdafds",b);
     createTable(SQL,"suck my balls",a);
-       printSQLschema(SQL);
 
-       printf("%d",getHashid("helo"));
+       node* n = nodeInit(returnTable(SQL,"fuck"));
+    appendElement(n,"12345");
+    appendElement(n,"Master Andy");
+    appendElement(n,"Wegmans");
+    appendElement(n,"Sophomore");
+    appendElement(n,"100");
+
+  //  appendElement(n,"fuckoff");
+    //printSQLschema(SQL);
+    node* n1 = nodeInit(returnTable(SQL,"fuck"));
+    appendElement(n1,"12345");
+    appendElement(n1,"Master Andy");
+    appendElement(n1,"Wegmans");
+    appendElement(n1,"Sophomore");
+    appendElement(n1,"200");
+    node* n2 = nodeInit(returnTable(SQL,"fuck"));
+    appendElement(n2,"12345");
+    appendElement(n2,"Master Andy");
+    appendElement(n2,"Wegmans");
+    appendElement(n2,"Sophomore");
+    appendElement(n2,"200");
+   int res=  insertIntoTable(SQL,"fuck",n);
+   insertIntoTable(SQL,"fuck",n1);
+    insertIntoTable(SQL,"fuck",n2);
+      printf("%d\n",res);
+       printTable(returnTable(SQL,"fuck"));
+
+      // printf("%d",getHashid("shhjghgghdfjgdashfkjdshfksfhjsdfhhj"));
 }
