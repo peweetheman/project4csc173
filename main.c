@@ -210,16 +210,17 @@ int main() {
     appendElement(n1,"Sophomore");
     appendElement(n1,"200");
     node* n2 = nodeInit(returnTable(SQL,"fuck"));
-    appendElement(n2,"12345");
+    appendElement(n2,"1dfdf5");
     appendElement(n2,"Master Andy");
     appendElement(n2,"Wegmans");
     appendElement(n2,"Sophomore");
     appendElement(n2,"200");
-   int res=  insertIntoTable(SQL,"fuck",n);
-   insertIntoTable(SQL,"fuck",n1);
-    insertIntoTable(SQL,"fuck",n2);
+   int res= insertIntoTable(SQL,"fuck",n);
+   int res1 = insertIntoTable(SQL,"fuck",n1);
+   int res2 = insertIntoTable(SQL,"fuck",n2);
       printf("%d\n",res);
+    printf("%d\n",res1);
+    printf("%d\n",res2);
        printTable(returnTable(SQL,"fuck"));
-
       // printf("%d",getHashid("shhjghgghdfjgdashfkjdshfksfhjsdfhhj"));
 }

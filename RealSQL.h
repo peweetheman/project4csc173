@@ -272,6 +272,18 @@ int compareNodes(node * n1, node * n2){
     return 0;
 };
 
+bool nodeExisted(Table * table, node* n){
+    node * t= table->data[n->hashId];
+    while(t!=NULL){
+        if(compareNodes(t, n)==1){
+            t=t->nextNode;
+        }else if(compareNodes(t, n)==0){
+            return 1;
+        }
+    }
+    return 0;
+
+};
 
 //insert into the table
 //0: the table doesn't exist
@@ -288,22 +300,22 @@ int insertIntoTable(RealSQL * SQL, char * tableName, node * data){
            // printf("%s", temp->name);
             int dataHash = data->hashId;
             if(temp->data[dataHash]==NULL){
-              //  printf("%d", data->hashId);
                 temp->data[data->hashId]=data;
             }else{
+                if(nodeExisted(temp, data)==1){
+                  //  printf("duplicated entry");
+                    return 2;
+                }
                 node * tempNode= temp->data[data->hashId];
                 while(temp->data[data->hashId]->nextNode!=NULL){
-                    if(compareNodes(data, temp->data[data->hashId])==1){
+                   // printNode(data);
+                   // printf("%d\n", compareNodes(data, temp->data[data->hashId]));
                         temp->data[data->hashId]=temp->data[data->hashId]->nextNode;
-                    }else{
-                        //duplicate input
-                        temp->data[data->hashId]=tempNode;
-                        return 2;
-                    }
                 }
                 temp->data[data->hashId]->nextNode=data;
                 temp->data[data->hashId]=tempNode;
             }
+            return 1;
         }
 
     }else{
@@ -330,3 +342,7 @@ void printTable(Table * table){
     }
 }
 
+
+Table * SELECT(RealSQL * SQL,char * tableName, attributes * attributes){
+
+};
