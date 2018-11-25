@@ -9,6 +9,10 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
+#include "RealSQL.h"
+
+
+FILE* file;
 
 typedef struct CSG *TUPLELISTCSG;
 struct CSG{
@@ -91,6 +95,21 @@ void printCR(){
         int index = 0;
         while(temp != NULL){
             printf("%s, %s \n", temp->Course, temp->Room);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+
+void printFileCR(FILE* file){
+    fprintf(file, "%s\n", "CR");
+    fprintf(file, "%s,%s\n", "Course", "Room");
+    for(int i = 0; i < 128; i++){
+
+        TUPLELISTCR temp = HTCR[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file, "%s,%s\n", temp->Course, temp->Room);
             temp = temp->next;
             index++;
         }
@@ -214,6 +233,20 @@ void printCSG(){
     }
 }
 
+void printFileCSG(FILE* file){
+    fprintf(file, "%s\n", "CSG");
+    fprintf(file, "%s,%s,%s\n", "Course", "StudentId", "Grade");
+    for(int i = 0; i < 128; i++){
+        TUPLELISTCSG temp = HTCSG[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file,"%s,%d,%s\n", temp->Course, temp->StudentId, temp->Grade);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+
 void printCSGTUPLEList(TUPLELISTCSG main){
     TUPLELISTCSG temp = main;
     while(temp != NULL){
@@ -298,6 +331,20 @@ void printSNAP(){
         int index = 0;
         while(temp != NULL){
             printf("%d, %s, %s, %s \n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+
+void printFileSNAP(FILE* file){
+    fprintf(file, "%s\n", "SNAP");
+    fprintf(file, "%s,%s,%s,%s\n", "StudentId", "Name", "Address", "PhoneNumber");
+    for(int i = 0; i < 1009; i++){
+        TUPLELISTSNAP temp = HTSNAP[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file, "%d,%s,%s,%s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
             temp = temp->next;
             index++;
         }
@@ -401,6 +448,21 @@ void printCP(){
     }
 }
 
+void printFileCP(FILE* file){
+    fprintf(file, "%s\n", "CP");
+    fprintf(file, "%s,%s\n", "Course", "PhoneNumber");
+    for(int i = 0; i < 128; i++){
+        TUPLELISTCP temp = HTCP[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file, "%s,%s\n", temp->Course, temp->PrereqCourse);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+
+
 void printCPTUPLEList(TUPLELISTCP main){
     TUPLELISTCP temp = main;
     while(temp != NULL){
@@ -484,6 +546,20 @@ void printCDH(){
         int index = 0;
         while(temp != NULL){
             printf("%s, %s, %s \n", temp->Course, temp->Day, temp->Hour);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+
+void printFileCDH(FILE* file){
+    fprintf(file, "%s\n", "CDH");
+    fprintf(file, "%s,%s,%s\n", "Course", "Day", "Hour");
+    for(int i = 0; i < 128; i++){
+        TUPLELISTCDH temp = HTCDH[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file, "%s,%s,%s\n", temp->Course, temp->Day, temp->Hour);
             temp = temp->next;
             index++;
         }
@@ -726,28 +802,59 @@ TUPLELISTDH project_CRDH(TUPLELISTCRDH crdh){
 
 
 //should change void to linkedlist of char* later so we can keep track of the data
-void splitSpaces(char* input){
+attributes* splitSpaces(char* input){
     char* duplicateInput = strdup(input);
     char * split;
-    printf ("Splitting string \"%s\" into tokens:\n", duplicateInput);
+    attributes* head = attrInit("null");
+    printf ("Spliting string \"%s\" into tokens:\n", duplicateInput);
     split = strtok (duplicateInput," ");
-
     while (split != NULL)
     {
-        printf ("%s\n",split);
+        if(strcmp(head->attr, "null") == 0){
+            head = attrInit(split);
+        }else{
+            appendAttribute(head, split);
+            //printf ("%s\n",split);
+        }
         split = strtok (NULL, " ");
+
     }
+    return head;
 }
 
-void splitCommas(char* input){
+attributes* splitCommas(char* input){
     char* duplicateInput = strdup(input);
     char * split;
+    attributes* head = attrInit("null");
     printf ("Splitting string \"%s\" into tokens:\n", duplicateInput);
-    split = strtok (duplicateInput,",");
+    split = strtok (duplicateInput,",()");
 
     while (split != NULL)
     {
-        printf ("%s\n",split);
-        split = strtok (NULL, ",");
+        if(strcmp(head->attr, "null") == 0){
+            head = attrInit(split);
+        }else{
+            appendAttribute(head, split);
+            //printf ("%s\n",split);
+        }
+        split = strtok (NULL, ",()");
     }
+    return head;
+}
+
+void writeFile(FILE* file){
+    printFileCSG(file);
+    printFileSNAP(file);
+    printFileCP(file);
+    printFileCDH(file);
+    printFileCR(file);
+}
+
+void readFile(FILE* file){
+
+    if(file == NULL){
+        printf("File is null\n");
+        return;
+    }
+//    while()
 }
