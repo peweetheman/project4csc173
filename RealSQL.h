@@ -18,7 +18,7 @@
 
 typedef struct attributes{
     char * attr;
-    struct attitubes * next;
+    struct attributes * next;
 }attributes;
 
 
@@ -507,7 +507,70 @@ Table * generateResultTable(Table * target, attributes * resultAttributes){
 
 }
 
+void removeNode(Table * target, node * n){
+    node * temp = target->data[n->hashId];
+    if(compareNodes(temp, n)==0){
+        target->data[n->hashId]=target->data[n->hashId]->nextNode;
+        return;
+    }else{
+        while(compareNodes(n, temp->nextNode)==1){
+            temp=temp->nextNode;
+        }
+        temp->nextNode=temp->nextNode->nextNode;
+        return;
+    }
+
+};
+
+bool satisfyOneArg(conditions * cond, node * n){
+    attributes * temp =attrInit(cond->attr);
+    if(tableContainsRequired(n->attributes, temp)==1){
+        element * temp1 = n->head;
+        while(temp1!=NULL){
+            if(strcmp(temp1->name, cond->attr)==0){
+                if(strcmp(temp1->value, cond->value)==0){
+                    return 1;
+                }else{
+                    return 0;
+                }
+            }
+            temp1=temp1->nextElement;
+        }
+    }else{
+        return 0;
+    }
+};
+
+bool satisfyArgs(node * n, conditionsRoot * root){
+    conditions * temparg = root->args;
+    while (temparg!=NULL) {
+        conditions *temparg1 = temparg;
+        while (temparg1 != NULL) {
+            if(satisfyOneArg(temparg1, n)==0){
+                break;
+            }
+            temparg1 = temparg1->Lowerargs;
+        }
+        if (temparg1 == NULL) {
+            return 1;
+        }
+        temparg=temparg->Nextargs;
+    }
+    return 0;
+};
+
 Table * applyConditions(Table * resultTable, conditionsRoot * root){
+
+    for(int i=0; i< 1009; i++){
+        node * tempNode = resultTable->data[i];
+        while(tempNode!=NULL){
+            if(satisfyArgs(tempNode, root)==0){
+                removeNode(resultTable, tempNode);
+            }
+            tempNode=tempNode->nextNode;
+        }
+    }
+    return resultTable;
 
 };
 
