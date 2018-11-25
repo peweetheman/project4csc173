@@ -187,6 +187,112 @@ void delete_CR(char* course, char* room){
         }
     }
 }
+void delete_CSG(char* course, int studentID, char* Grade){
+    for(int i = 0; i < 128; i++) {
+        TUPLELISTCSG temp = HTCSG[i];
+        while (temp != NULL) {
+            if ((strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
+                && (temp->StudentId == studentID || studentID == 0)
+                && (strcmp(temp->Grade, Grade) == 0 || strcmp("*", Grade) == 0)){
+                if(temp->next == NULL){
+                    free(temp->Course);
+                    free(temp->Grade);
+                    temp=NULL;
+                    HTCSG[i] = NULL;
+                }
+                else {
+                    strcpy(temp->Course, temp->next->Course);
+                    strcpy(temp->Grade, temp->next->Grade);
+                    temp->next->StudentId = temp->StudentId;
+                    temp->next = temp->next->next;
+                }
+            }
+            else{
+                temp = temp->next;
+            }
+        }
+    }
+}
+void delete_SNAP(int studentID, char* Name, char* address, char* phone){
+    for(int i = 0; i < 128; i++) {
+        TUPLELISTSNAP temp = HTSNAP[i];
+        while (temp != NULL) {
+            if ((strcmp(temp->Phone, phone) == 0 || strcmp("*", phone) == 0)
+                && (temp->StudentId == studentID || studentID == 0)
+                && (strcmp(temp->Address, address) == 0 || strcmp("*", address) == 0)
+                && (strcmp(temp->Name, Name) == 0 || strcmp("*", Name) == 0)){
+                if(temp->next == NULL){
+                    free(temp->Name);
+                    free(temp->Address);
+                    free(temp->Phone);
+                    temp=NULL;
+                    HTSNAP[i] = NULL;
+                }
+                else {
+                    strcpy(temp->Phone, temp->next->Phone);
+                    strcpy(temp->Name, temp->next->Name);
+                    strcpy(temp->Address, temp->next->Address);
+                    temp->next->StudentId = temp->StudentId;
+                    temp->next = temp->next->next;
+                }
+            }
+            else{
+                temp = temp->next;
+            }
+        }
+    }
+}
+
+void delete_CDH(char* course, char* Day, char* Hour){
+    for(int i = 0; i < 128; i++) {
+        TUPLELISTCDH temp = HTCDH[i];
+        while (temp != NULL) {
+            if ((strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
+                && (strcmp(temp->Hour, Hour) == 0 || strcmp("*", Hour) == 0)
+                && (strcmp(temp->Day, Day) == 0 || strcmp("*", Day) == 0)){
+                if(temp->next == NULL){
+                    free(temp->Course);
+                    free(temp->Day);
+                    temp=NULL;
+                    HTCDH[i] = NULL;
+                }
+                else {
+                    strcpy(temp->Course, temp->next->Course);
+                    strcpy(temp->Day, temp->next->Day);
+                    strcpy(temp->Hour, temp->next->Hour);
+                    temp->next = temp->next->next;
+                }
+            }
+            else{
+                temp = temp->next;
+            }
+        }
+    }
+}
+void delete_CP(char* course, char* prq){
+    for(int i = 0; i < 128; i++) {
+        TUPLELISTCP temp = HTCP[i];
+        while (temp != NULL) {
+            if ((strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
+                && (strcmp(temp->PrereqCourse, prq) == 0 || strcmp("*", prq) == 0)){
+                if(temp->next == NULL){
+                    free(temp->Course);
+                    free(temp->PrereqCourse);
+                    temp=NULL;
+                    HTCP[i] = NULL;
+                }
+                else {
+                    strcpy(temp->Course, temp->next->Course);
+                    strcpy(temp->PrereqCourse, temp->next->PrereqCourse);
+                    temp->next = temp->next->next;
+                }
+            }
+            else{
+                temp = temp->next;
+            }
+        }
+    }
+}
 
 
 
@@ -223,7 +329,7 @@ void printCSGTUPLEList(TUPLELISTCSG main){
     printf("\n");
 }
 
-TUPLELISTCSG lookup_CSG(char* course, int id, char* grade){
+TUPLELISTCSG lookup_CSG(char* course, int id, char* Day){
     TUPLELISTCSG firstNode = NULL;
     TUPLELISTCSG matching = (TUPLELISTCSG) malloc(sizeof(struct CSG));
     for(int i = 0; i < 128; i++) {
@@ -231,7 +337,7 @@ TUPLELISTCSG lookup_CSG(char* course, int id, char* grade){
         while (temp != NULL) {
             if ((id == 0 || id == temp->StudentId)
                 && (strcmp(temp->Course, course) == 0 || strcmp("*", course) == 0)
-                && (strcmp(temp->Grade, grade) == 0 || strcmp("*", grade) == 0)) {
+                && (strcmp(temp->Grade, Day) == 0 || strcmp("*", Day) == 0)) {
                 TUPLELISTCSG temp2 = temp;
                 temp2->StudentId = temp->StudentId;
                 strcpy(temp2->Course, temp->Course);
@@ -252,11 +358,11 @@ TUPLELISTCSG lookup_CSG(char* course, int id, char* grade){
 
 
 //handles collisions as far as I know
-void insert_CSG(char* course, int id, char* grade){
+void insert_CSG(char* course, int id, char* Day){
     TUPLELISTCSG data = (TUPLELISTCSG) malloc(sizeof (struct CSG));
     data->StudentId = id;
     strcpy(data->Course, course);
-    strcpy(data->Grade, grade);
+    strcpy(data->Grade, Day);
     data->next = NULL;
     int hashIndex = hashCSG(course);
     if(HTCSG[hashIndex] == NULL){
@@ -527,10 +633,8 @@ TUPLELISTCDH lookup_CDH(char* course, char* day, char* hour){
     return firstNode;
 }
 
-//CONCANTENATION ISSUE THAT CAN'T BE SOLVED WITH THE CD TRICK
 void insert_CDH(char* course, char* day, char hour[]){
     TUPLELISTCDH data = (TUPLELISTCDH) malloc(sizeof (struct CDH));
- //   data->doesAbsolutelyNothing = doNothing;
     strcpy(data->Course, course);
     strcpy(data->Day, day);
     strcpy(data->Hour, hour);
@@ -560,37 +664,31 @@ void insert_CDH(char* course, char* day, char hour[]){
 
 //PART TWO FUNCTIONS!!
 
-void getGrade(char* studentName, char* courseName){
-    int check = 0;
+void getDay(char* studentName, char* courseName){
     TUPLELISTSNAP possibleTuple = lookup_SNAP(0, studentName, "*", "*");
-
     while(possibleTuple != NULL) {
         TUPLELISTCSG possibleCSG = lookup_CSG(courseName, possibleTuple->StudentId, "*");
         if(possibleCSG!= NULL){
-            check = 1;
-            printf("%s got a grade of %s in the course %s \n", studentName, possibleCSG->Grade, courseName);
+            printf("%s got a Grade of %s in the course %s \n", studentName, possibleCSG->Grade, courseName);
+            return;
         }
         possibleTuple = possibleTuple->next;
     }
-    if (check ==0){
-        printf("It doesn't look like %s took the course %s \n", studentName, courseName);
-    }
+    printf("It doesn't look like %s took the course %s \n", studentName, courseName);
 }
 
 void getRoom(char* studentName, char* time, char* day){
-
-    int check = 0;
     TUPLELISTSNAP possibleSNAP = lookup_SNAP(0, studentName, "*", "*");
-
     while(possibleSNAP != NULL) {
         TUPLELISTCSG possibleCSG = lookup_CSG("*", possibleSNAP->StudentId, "*");
+        //elimnate duplicate courses!
         while(possibleCSG!= NULL){
             TUPLELISTCDH possibleCDH = lookup_CDH(possibleCSG->Course, day, time);
             while(possibleCDH!=NULL){
                 TUPLELISTCR possibleCR = lookup_CR(possibleCDH->Course, "*");
                 if(possibleCR!=NULL){
-                    check =1;
                     printf("%s is in %s at %s on %s \n", studentName, possibleCR->Room, time, day);
+                    return;
                 }
                 possibleCDH = possibleCDH->next;
             }
@@ -598,15 +696,13 @@ void getRoom(char* studentName, char* time, char* day){
         }
         possibleSNAP = possibleSNAP->next;
     }
-    if (check ==0){
-        printf("It doesn't look like we have that information \n");
-    }
+    printf("It doesn't look like we have that information \n");
 }
 
 //Part iii methods
 
-TUPLELISTCSG select_CSG(char* course, int id, char* grade){ // for part iii
-    TUPLELISTCSG stuff = (lookup_CSG(course, id, grade));
+TUPLELISTCSG select_CSG(char* course, int id, char* Day){ // for part iii
+    TUPLELISTCSG stuff = (lookup_CSG(course, id, Day));
     return stuff;
 }
 

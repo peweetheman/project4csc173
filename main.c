@@ -13,7 +13,7 @@ void REPL(){
     printf("Enter the Course Name: ");
     scanf(" %[^\n]s",courseName);
 
-    getGrade(studentName, courseName);
+    getDay(studentName, courseName);
     printf("Enter 1 to continue this REPL or anything else to move on: ");
     char check[100];
     scanf(" %[^\n]s",check);
@@ -41,9 +41,9 @@ void REPL2(){
 
     printf("Enter 1 to continue this REPL or anything else to move on: ");
     char check[100];
-    scanf(" %[^\n]s",check);
+    scanf(" %[^\n]s", check);
     if(strcmp(check, "1") == 0){
-        REPL();
+        REPL2();
     }
 
 }
@@ -78,6 +78,7 @@ int main() {
     printf("\nlookup function on \"CS101\", 12345, \"*\": \n");
     TUPLELISTCSG matching5 = lookup_CSG("CS101", 12345, "*");
     printCSGTUPLEList(matching5);
+    printCSG();
 
     printf("\n\n");
     printf("NOW SHOWING C-P relation: \n");
@@ -91,6 +92,7 @@ int main() {
     insert_CP("CS205", "CS101");
     insert_CP("CS206", "CS121");
     insert_CP("CS206", "CS205");
+    insert_CP("CS999", "CS999");
 
     printCP();
 
@@ -111,7 +113,10 @@ int main() {
     printf("\nlookup function on \"CS206\", \"*\": \n");
     TUPLELISTCP matching4 = lookup_CP("CS206", "*");
     printCPTUPLEList(matching4);
-        printf("\n\n");
+    printf("After delete function on CS999, CS999: \n");
+    delete_CP("CS999", "CS999");
+    printCP();
+    printf("\n\n");
     printf("NOW SHOWING C-D-H relation: \n");
 
 
@@ -124,10 +129,14 @@ int main() {
     insert_CDH("EE200", "W", "1PM");
     insert_CDH("EE200", "Th", "10AM");
     insert_CDH("EE200", "Th", "10AM");
+    insert_CDH("CS999", "SS", "99AM");
     printCDH();
     printf("\nlookup function of *, *, '9AM' : \n");
     TUPLELISTCDH matching3 = lookup_CDH("*", "*", "9AM");
     printCDHTUPLEList(matching3);
+    printf("After delete CS999, SS, 99AM \n");
+    delete_CDH("CS999", "SS", "99AM");
+    printCDH();
 
     printf("\n\n");
     printf("NOW SHOWING C-R relation: \n");
@@ -150,9 +159,9 @@ int main() {
 
 
     //PART TWO!!!
-    printf("\n\n\n NOW TESTING PART TWO REPL \n");
-//    REPL();
-//    REPL2();
+    printf("\n\n\n NOW TESTING PART TWO REPL THEY ARE CASE SENSITIVE \n");
+    REPL();
+    REPL2();
 
     //PART THREE!!!!!
     printf("\n\n NOW TESTING PART THREE \n");
