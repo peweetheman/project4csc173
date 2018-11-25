@@ -177,6 +177,10 @@ int main() {
 //    printDH(dh);
 //    return 0;
 
+
+
+
+
     RealSQL * SQL= sqlinit();
     attributes * a = attrInit("studentid");
     appendAttribute(a, "name");
@@ -239,5 +243,7 @@ int main() {
        dropTable(SQL,"fuck");
        printSQLschema(SQL);
     dropTable(SQL,"fuck");
+
+    splitCommas("CreateTable <name> id,name,grade");
       // printf("%d",getHashid("shhjghgghdfjgdashfkjdshfksfhjsdfhhj"));
 }

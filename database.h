@@ -723,3 +723,31 @@ TUPLELISTDH project_CRDH(TUPLELISTCRDH crdh){
     }
     return first;
 }
+
+
+//should change void to linkedlist of char* later so we can keep track of the data
+void splitSpaces(char* input){
+    char* duplicateInput = strdup(input);
+    char * split;
+    printf ("Splitting string \"%s\" into tokens:\n", duplicateInput);
+    split = strtok (duplicateInput," ");
+
+    while (split != NULL)
+    {
+        printf ("%s\n",split);
+        split = strtok (NULL, " ");
+    }
+}
+
+void splitCommas(char* input){
+    char* duplicateInput = strdup(input);
+    char * split;
+    printf ("Splitting string \"%s\" into tokens:\n", duplicateInput);
+    split = strtok (duplicateInput,",");
+
+    while (split != NULL)
+    {
+        printf ("%s\n",split);
+        split = strtok (NULL, ",");
+    }
+}
