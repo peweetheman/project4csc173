@@ -202,7 +202,7 @@ int main() {
     appendElement(n,"100");
 
   //  appendElement(n,"fuckoff");
-    //printSQLschema(SQL);
+
     node* n1 = nodeInit(returnTable(SQL,"fuck"));
     appendElement(n1,"12345");
     appendElement(n1,"Master Andy");
@@ -217,10 +217,27 @@ int main() {
     appendElement(n2,"200");
    int res= insertIntoTable(SQL,"fuck",n);
    int res1 = insertIntoTable(SQL,"fuck",n1);
-   int res2 = insertIntoTable(SQL,"fuck",n2);
+   int res2 = insertIntoTable(SQL,"suck my balls",n2);
       printf("%d\n",res);
     printf("%d\n",res1);
     printf("%d\n",res2);
        printTable(returnTable(SQL,"fuck"));
+     //  printTable(returnTable(SQL,"suck my balls"));
+
+
+    attributes * c = attrInit("room");
+
+    appendAttribute(c, "grade");
+    appendAttribute(c, "name");
+    appendAttribute(c,"studentid");
+    appendAttribute(c, "numOfPeopleFucked");
+//    appendAttribute(c, "name");
+//    appendAttribute(c, "room");
+       SELECT(SQL,"suck my balls",c,NULL);
+       printf("\n");
+       printSQLschema(SQL);
+       dropTable(SQL,"fuck");
+       printSQLschema(SQL);
+    dropTable(SQL,"fuck");
       // printf("%d",getHashid("shhjghgghdfjgdashfkjdshfksfhjsdfhhj"));
 }

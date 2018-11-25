@@ -67,7 +67,7 @@ typedef struct node{
 typedef struct Table{
     char * name;
     //array of strings
-    struct attributes * attributes;
+    attributes * attributes;
     node * data[1009];
     struct Table * nextTable;
 }Table;
@@ -303,13 +303,11 @@ int insertIntoTable(RealSQL * SQL, char * tableName, node * data){
                 temp->data[data->hashId]=data;
             }else{
                 if(nodeExisted(temp, data)==1){
-                  //  printf("duplicated entry");
+                    printf("duplicated entry\n");
                     return 2;
                 }
                 node * tempNode= temp->data[data->hashId];
                 while(temp->data[data->hashId]->nextNode!=NULL){
-                   // printNode(data);
-                   // printf("%d\n", compareNodes(data, temp->data[data->hashId]));
                         temp->data[data->hashId]=temp->data[data->hashId]->nextNode;
                 }
                 temp->data[data->hashId]->nextNode=data;
@@ -342,7 +340,222 @@ void printTable(Table * table){
     }
 }
 
+//Table * selectHelper(RealSQL * SQL,char * tableName, attributes * attributes){
+//
+//};
+bool countStars(attributes * attr){
+    int count =0;
+    attributes * temp= attr;
+    while(temp!=NULL){
+        if(strcmp(temp->attr,"*")==0){
+            count++;
+        }
+        temp=temp->next;
+    }
+    return count;
+}
 
-Table * SELECT(RealSQL * SQL,char * tableName, attributes * attributes){
+bool selectAll(attributes * a){
+    if(strcmp(a->attr,"*")==0 && a->next==NULL){
+        return 1;
+    }
+    return 0;
+}
+
+//attributes tableA contains attributes A
+bool tableContainsRequired(attributes * tableA, attributes * A){
+    attributes * tempA=A;
+    attributes * tempT=tableA;
+    int contained = 0;
+    while(tempA!=NULL){
+
+        while(tempT!=NULL){
+            if(strcmp(tempT->attr,tempA->attr)==0){
+                contained=1;
+                break;
+            }
+            tempT=tempT->next;
+        }
+        if(contained==0){
+            return 0;
+        }else if(contained==1){
+            contained=0;
+        }
+        tempA=tempA->next;
+        tempT=tableA;
+    }
+    return 1;
+};
+
+//make sure that the attributes you want is acutally in the table
+bool EnsureProperAttributes(Table * table, attributes * A){
+    attributes * temp = table->attributes;
+    if(tableContainsRequired(temp, A)==1){
+        return 1;
+    }else{
+        return 0;
+    }
+};
+
+void internalInsertion(Table * temp, node * data){
+    //Table * temp = returnTable(SQL, tableName);
+    // printf("%s", temp->name);
+    int dataHash = data->hashId;
+    if(temp->data[dataHash]==NULL){
+        temp->data[data->hashId]=data;
+    }else{
+//        if(nodeExisted(temp, data)==1){
+//            printf("duplicated entry\n");
+//            return 2;
+//        }
+        node * tempNode= temp->data[data->hashId];
+        while(temp->data[data->hashId]->nextNode!=NULL){
+            temp->data[data->hashId]=temp->data[data->hashId]->nextNode;
+        }
+        temp->data[data->hashId]->nextNode=data;
+        temp->data[data->hashId]=tempNode;
+    }
+};
+
+//you might want to free the table that this function created
+Table * generateResultTable(Table * target, attributes * resultAttributes){
+    Table * t = malloc(sizeof(Table));
+    t->name="InternalTempTable";
+    t->attributes=resultAttributes;
+    t->nextTable=NULL;
+    for (int i = 0; i < 1009; i++) {
+        t->data[i]=malloc(sizeof(node));
+        t->data[i]=NULL;
+    }
+
+    for(int i = 0; i<1009; i++){
+        if(target->data[i]==NULL){
+            continue;
+        }else{
+            node * temp = target->data[i];
+            while(temp!=NULL){
+                node * tempNode = nodeInit(t);
+                //tempNode->attributes=resultAttributes;
+                attributes * internalApointer = resultAttributes;
+                element * elementPointer=temp->head;
+                while(internalApointer!=NULL){
+                    while(elementPointer!=NULL){
+                        if(strcmp(elementPointer->name,internalApointer->attr)==0){
+                            appendElement(tempNode, elementPointer->value);
+                            elementPointer=temp->head;
+                            break;
+                        }
+                        elementPointer=elementPointer->nextElement;
+                    }
+                    internalApointer=internalApointer->next;
+                }
+
+                //insert the tempNode into the table
+                internalInsertion(t, tempNode);
+                temp=temp->nextNode;
+
+            }
+        }
+    }
+
+    return t;
+
+}
+
+Table * applyConditions(Table * resultTable, int conditions){
 
 };
+
+Table * SELECT(RealSQL * SQL,char * tableName, attributes * A, int conditions){
+    if(tableExist(SQL, tableName)){
+        Table * tempTable = returnTable(SQL, tableName);
+        int stars = countStars(A);
+        attributes * Apointer;
+        //RealSQL * SQL, char * name, attributes * attributes
+        if(selectAll(A)==1){
+                //all the attributes
+               // return tempTable;
+            Apointer = tempTable->attributes;
+        }else{
+                //projects
+                //x==1 && y==2 || z ==3
+                //make sure that attributes are entered properly
+                if(EnsureProperAttributes(tempTable, A)==1){
+                    Apointer = A;
+                }else{
+                    //improper attributes input
+                    printf("your attributes doesn't match the table\n");
+                    return NULL;
+                }
+            }
+        //generic loopup
+        //generate result table
+        Table  * resultTable = generateResultTable(tempTable, Apointer);
+
+        //apply the conditions
+        if(conditions==NULL){
+            //projection
+            printTable(resultTable);
+            return resultTable;
+        }else{
+            Table * it= applyConditions(resultTable, conditions);
+            if(it==NULL){
+                //improper conditions
+                printf("improper conditions\n");
+                return NULL;
+            }else{
+                //return that table
+                printTable(it);
+                return it;
+            }
+        }
+
+    }else{
+        //table doesn't exist
+        printf("The table you entered doesn't exist\n");
+        return NULL;
+    }
+};
+
+void dropTable(RealSQL * SQL, char * tablename){
+    if(tableExist(SQL,tablename)==1){
+        //drop the table
+        Table * tablepointer = SQL->root;
+        Table * deleteTable = returnTable(SQL,tablename);
+
+        while(tablepointer->nextTable!=deleteTable){
+            tablepointer=tablepointer->nextTable;
+        }
+
+        if(deleteTable->nextTable==NULL){
+            tablepointer->nextTable=NULL;
+        }else{
+            tablepointer->nextTable=deleteTable->nextTable;
+        }
+        printf("%s is deleted\n", tablename);
+    }else{
+        printf("table doesn't exist\n");
+    }
+};
+
+
+typedef struct conditions{
+    char * attr;
+    char * value;
+    char * condToPrevious;
+    struct conditions * args;
+}conditions;
+
+conditions * conditionsInit(){
+    conditions * con =malloc(sizeof(conditions));
+    con->attr=NULL;
+    con->value=NULL;
+    con->condToPrevious=NULL;
+    con->args=malloc(sizeof(conditions));
+    con->args=NULL;
+    return con;
+};
+
+void
+//key words: select, desc, createTable, insert, showTables, dropTable
+
