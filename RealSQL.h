@@ -556,6 +556,6 @@ conditions * conditionsInit(){
     return con;
 };
 
-void
+//void
 //key words: select, desc, createTable, insert, showTables, dropTable
 
