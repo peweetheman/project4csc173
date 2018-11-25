@@ -13,27 +13,49 @@
 #include <stdlib.h>
 
 
+
+
+
 typedef struct attributes{
     char * attr;
     struct attitubes * next;
 }attributes;
 
 
-attributes * attrInit(char * attr){
-    attributes * a = malloc(sizeof(attributes));
-    a->attr=attr;
-    a->next=NULL;
-    return a;
-}
+attributes * attrInit(char *);
 
 void appendAttribute(attributes * head, char * attr){
-  //  attributes * temp = head;
+    //  attributes * temp = head;
     while(head->next!=NULL){
         head=head->next;
     }
     attributes * data = attrInit(attr);
     head->next=data;
 };
+
+attributes * InternalattrInit(){
+    attributes * a = malloc(sizeof(attributes));
+    a->attr=NULL;
+    a->next=NULL;
+    return a;
+};
+
+attributes * InternalappendAttributes(attributes * head, char * attr){
+    if(head->attr==NULL){
+        head->attr=attr;
+    }else{
+        appendAttribute(head, attr);
+    }
+};
+
+attributes * attrInit(char * attr){
+    attributes * a = malloc(sizeof(attributes));
+    a->attr=attr;
+    a->next=NULL;
+    return a;
+};
+
+
 
 void printAttributes(attributes * attr){
     do{
@@ -76,6 +98,29 @@ typedef struct RealSQL{
     Table * root;
 }RealSQL;
 
+
+typedef struct conditionsRoot{
+    attributes * attr;
+    struct conditions * args;
+}conditionsRoot;
+
+typedef struct conditions{
+    char * attr;
+    char * value;
+    char * condToPrevious;
+    struct conditions * Nextargs;
+    struct conditions * Lowerargs;
+}conditions;
+
+conditions * conditionsInit(char * attr, char * value, char * condToPre){
+    conditions * cond = malloc(sizeof(conditions));
+    cond->attr=attr;
+    cond->value=value;
+    cond->condToPrevious=condToPre;
+    cond->Nextargs=NULL;
+    cond->Lowerargs=NULL;
+    return cond;
+};
 
 //initialize the SQL
 RealSQL * sqlinit(){
@@ -462,11 +507,12 @@ Table * generateResultTable(Table * target, attributes * resultAttributes){
 
 }
 
-Table * applyConditions(Table * resultTable, int conditions){
+Table * applyConditions(Table * resultTable, conditionsRoot * root){
 
 };
 
-Table * SELECT(RealSQL * SQL,char * tableName, attributes * A, int conditions){
+
+Table * SELECT(RealSQL * SQL,char * tableName, attributes * A, conditionsRoot * root){
     if(tableExist(SQL, tableName)){
         Table * tempTable = returnTable(SQL, tableName);
         int stars = countStars(A);
@@ -493,12 +539,12 @@ Table * SELECT(RealSQL * SQL,char * tableName, attributes * A, int conditions){
         Table  * resultTable = generateResultTable(tempTable, Apointer);
 
         //apply the conditions
-        if(conditions==NULL){
+        if(root==NULL){
             //projection
             printTable(resultTable);
             return resultTable;
         }else{
-            Table * it= applyConditions(resultTable, conditions);
+            Table * it= applyConditions(resultTable, root);
             if(it==NULL){
                 //improper conditions
                 printf("improper conditions\n");
@@ -539,23 +585,41 @@ void dropTable(RealSQL * SQL, char * tablename){
 };
 
 
-typedef struct conditions{
-    char * attr;
-    char * value;
-    char * condToPrevious;
-    struct conditions * args;
-}conditions;
-
-conditions * conditionsInit(){
-    conditions * con =malloc(sizeof(conditions));
-    con->attr=NULL;
-    con->value=NULL;
-    con->condToPrevious=NULL;
+conditionsRoot * conditionsRootInit(){
+    conditionsRoot * con =malloc(sizeof(conditionsRoot));
+    con->attr=InternalattrInit();
+    //con->condToPrevious=NULL;
     con->args=malloc(sizeof(conditions));
     con->args=NULL;
     return con;
 };
 
+void appendCondition(conditionsRoot * root, char * condtopre, char * attr, char * value){
+    InternalappendAttributes(root->attr,attr);
+    if(condtopre==NULL){
+        conditions * condi = conditionsInit(attr, value, NULL);
+        root->args=condi;
+    }else {
+        if(strcmp(condtopre,"AND")==0){
+            conditions * tempCon = root->args;
+            while(tempCon->Nextargs!=NULL){
+                tempCon=tempCon->Nextargs;
+            }
+            while(tempCon->Lowerargs!=NULL){
+                tempCon=tempCon->Lowerargs;
+            }
+            tempCon->Lowerargs=conditionsInit(attr,value,"AND");
+       //     while()
+        }else if(strcmp(condtopre,"OR")==0){
+            conditions * tempCon = root->args;
+            while(tempCon->Nextargs!=NULL){
+                tempCon=tempCon->Nextargs;
+            }
+            tempCon->Nextargs=conditionsInit(attr,value,"OR");
+        }
+    }
+
+};
 //void
 //key words: select, desc, createTable, insert, showTables, dropTable
 

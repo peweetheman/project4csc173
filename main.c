@@ -202,7 +202,6 @@ int main() {
     appendElement(n,"100");
 
   //  appendElement(n,"fuckoff");
-
     node* n1 = nodeInit(returnTable(SQL,"fuck"));
     appendElement(n1,"12345");
     appendElement(n1,"Master Andy");
