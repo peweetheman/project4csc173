@@ -8,6 +8,7 @@
 #endif //PROJECT3CSC173ATTEMPT2_DATABASE_H
 #include <stdio.h>
 #include <malloc.h>
+#include "RealSQL.h"
 #include <string.h>
 
 typedef struct CSG *TUPLELISTCSG;
@@ -24,7 +25,7 @@ struct SNAP{
     int StudentId;
     char Name[30];
     char Address[50];
-    char Phone[9]; //string for temp->phone outputting gibberish......
+    char Phone[9];
     TUPLELISTSNAP next;
 };
 TUPLELISTSNAP HTSNAP[1009];
@@ -293,10 +294,6 @@ void delete_CP(char* course, char* prq){
         }
     }
 }
-
-
-
-
 
 
 //key is Course
@@ -664,7 +661,7 @@ void insert_CDH(char* course, char* day, char hour[]){
 
 //PART TWO FUNCTIONS!!
 
-void getDay(char* studentName, char* courseName){
+void getGrade(char* studentName, char* courseName){
     TUPLELISTSNAP possibleTuple = lookup_SNAP(0, studentName, "*", "*");
     while(possibleTuple != NULL) {
         TUPLELISTCSG possibleCSG = lookup_CSG(courseName, possibleTuple->StudentId, "*");
@@ -818,4 +815,232 @@ TUPLELISTDH project_CRDH(TUPLELISTCRDH crdh){
         }
     }
     return first;
+}
+
+
+attributes* splitSpaces(char* input){
+    char* duplicateInput = strdup(input);
+    char * split;
+    attributes* head = attrInit("null");
+    split = strtok (duplicateInput," ");
+    while (split != NULL)
+    {
+        if(strcmp(head->attr, "null") == 0){
+            head = attrInit(split);
+        }else{
+            appendAttribute(head, split);
+            //printf ("%s\n",split);
+        }
+        split = strtok (NULL, " ");
+
+    }
+    return head;
+}
+
+attributes* splitCommas(char* input){
+    char* duplicateInput = strdup(input);
+    char * split;
+    attributes* head = attrInit("null");
+    split = strtok (duplicateInput,",()\n");
+
+    while (split != NULL)
+    {
+        if(strcmp(head->attr, "null") == 0){
+            head = attrInit(split);
+        }else{
+            appendAttribute(head, split);
+            //printf ("%s\n",split);
+        }
+        split = strtok (NULL, ",()\n");
+    }
+    return head;
+}
+
+
+void printFileCDH(FILE* file){
+    fprintf(file, "%s\n", "CDH");
+    fprintf(file, "%s,%s,%s\n", "Course", "Day", "Hour");
+    for(int i = 0; i < 128; i++){
+        TUPLELISTCDH temp = HTCDH[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file, "%s,%s,%s\n", temp->Course, temp->Day, temp->Hour);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+void printFileCP(FILE* file){
+    fprintf(file, "%s\n", "CP");
+    fprintf(file, "%s,%s\n", "Course", "Prerequisite");
+    for(int i = 0; i < 128; i++){
+        TUPLELISTCP temp = HTCP[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file, "%s,%s\n", temp->Course, temp->PrereqCourse);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+void printFileSNAP(FILE* file){
+    fprintf(file, "%s\n", "SNAP");
+    fprintf(file, "%s,%s,%s,%s\n", "StudentId", "Name", "Address", "PhoneNumber");
+    for(int i = 0; i < 1009; i++){
+        TUPLELISTSNAP temp = HTSNAP[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file, "%d,%s,%s,%s\n", temp->StudentId, temp->Name, temp->Address, temp->Phone);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+void printFileCSG(FILE* file){
+    fprintf(file, "%s\n", "CSG");
+    fprintf(file, "%s,%s,%s\n", "Course", "StudentId", "Grade");
+    for(int i = 0; i < 128; i++){
+        TUPLELISTCSG temp = HTCSG[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file,"%s,%d,%s\n", temp->Course, temp->StudentId, temp->Grade);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+void printFileCR(FILE* file){
+    fprintf(file, "%s\n", "CR");
+    fprintf(file, "%s,%s\n", "Course", "Room");
+    for(int i = 0; i < 128; i++){
+
+        TUPLELISTCR temp = HTCR[i];
+        int index = 0;
+        while(temp != NULL){
+            fprintf(file, "%s,%s\n", temp->Course, temp->Room);
+            temp = temp->next;
+            index++;
+        }
+    }
+}
+
+
+void writeFile(char* name){
+    FILE* file = fopen(name, "w");
+    printFileCSG(file);
+    printFileSNAP(file);
+    printFileCP(file);
+    printFileCDH(file);
+    printFileCR(file);
+    fclose(file);
+}
+
+
+void readFile(char* name){
+    FILE* file = fopen(name, "r+");
+    char* line = NULL;
+    size_t t = 0;
+
+
+    if (file == NULL){
+        printf("That file doesn't exist!\n");
+        return;
+    }
+    int relation = 0;
+    attributes* temp;
+
+    getline(&line, &t, file);
+        printf("reading: %s\n", line);
+    temp = splitCommas(line);
+
+    if(strcmp(temp->attr, "CSG") == 0){
+        getline(&line, &t, file);
+        getline(&line, &t, file);
+        temp = splitCommas(line);
+        relation = 1;
+//            printf("line2: %s\n", line);
+    }
+    while(relation == 1){
+            printf("inserting to CSG: %s, %d, %s\n", temp->attr, atoi(temp->next->attr), temp->next->next->attr);
+        insert_CSG(temp->attr, atoi(temp->next->attr), temp->next->next->attr);
+        getline(&line, &t, file);
+//            printf("line: %s\n", line);
+        temp = splitCommas(line);
+        if(strcmp(temp->attr, "SNAP") == 0){
+//                printf("relation is 2\n");
+            relation = 2;
+            break;
+        }
+    }
+    getline(&line, &t, file);
+//        printf("line: %s\n", line);
+    getline(&line, &t, file);
+//        printf("line: %s\n", line);
+    temp = splitCommas(line);
+//        printf("atoi: %d\n", atoi(temp->attr));
+    while(relation == 2){
+            printf("inserting to SNAP: %d, %s, %s, %s\n", atoi(temp->attr), temp->next->attr, temp->next->next->attr, temp->next->next->next->attr);
+        insert_SNAP(atoi(temp->attr), temp->next->attr, temp->next->next->attr, temp->next->next->next->attr);
+        getline(&line, &t, file);
+//            printf("line: %s\n", line);
+        temp = splitCommas(line);
+        if(strcmp(temp->attr, "CP") == 0){
+//                printf("relation is 3\n");
+            relation = 3;
+        }
+    }
+    getline(&line, &t, file);
+//        printf("line: %s\n", line);
+    getline(&line, &t, file);
+//        printf("line: %s\n", line);
+    temp = splitCommas(line);
+    while(relation == 3){
+            printf("inserting to CP: %s, %s\n", temp->attr, temp->next->attr);
+        insert_CP(temp->attr, temp->next->attr);
+        getline(&line, &t, file);
+//            printf("line: %s\n", line);
+        temp = splitCommas(line);
+        if(strcmp(temp->attr, "CDH") == 0){
+//                printf("relation is 4\n");
+            relation = 4;
+        }
+    }
+    getline(&line, &t, file);
+//        printf("line: %s\n", line);
+    getline(&line, &t, file);
+//        printf("line: %s\n", line);
+    temp = splitCommas(line);
+    while(relation == 4){
+           printf("inserting to CDH: %s, %s, %s\n", temp->attr, temp->next->attr, temp->next->next->attr);
+        insert_CDH(temp->attr, temp->next->attr, temp->next->next->attr);
+        getline(&line, &t, file);
+//            printf("line: %s\n", line);
+        temp = splitCommas(line);
+        if(strcmp(temp->attr, "CR") == 0){
+//                printf("relation is 5\n");
+            relation = 5;
+        }
+    }
+    getline(&line, &t, file);
+//        printf("line: %s\n", line);
+    getline(&line, &t, file);
+//        printf("line: %s\n", line);
+    temp = splitCommas(line);
+    while(relation == 5){
+        printf("inserting to CR: %s, %s\n", temp->attr, temp->next->attr);
+        insert_CR(temp->attr, temp->next->attr);
+        getline(&line, &t, file);
+//            printf("lineLast: %s\n", line);
+        temp = splitCommas(line);
+        if(fgetc(file) == EOF){
+            insert_CR(temp->attr, temp->next->attr);
+//                printf("inserting to CR: %s, %s\n", temp->attr, temp->next->attr);
+            break;
+        }
+    }
+    fclose(file);
+    if (line) {
+        free(line);
+    }
+
 }

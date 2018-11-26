@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include "database.h"
-
+#include "QueryParser.h"
 
 void REPL(){
     printf("\nQuery of 'What GRADE did STUDENTNAME get in COURSENAME' \n");
@@ -13,7 +12,7 @@ void REPL(){
     printf("Enter the Course Name: ");
     scanf(" %[^\n]s",courseName);
 
-    getDay(studentName, courseName);
+    getGrade(studentName, courseName);
     printf("Enter 1 to continue this REPL or anything else to move on: ");
     char check[100];
     scanf(" %[^\n]s",check);
@@ -49,6 +48,7 @@ void REPL2(){
 }
 
 int main() {
+
     TUPLELISTSNAP HTSNAP = malloc(sizeof (struct SNAP) * 1009);
     printf("NOW SHOWING S-N-A-P relation: \n");
 
@@ -105,7 +105,7 @@ int main() {
     insert_CP("CS205", "CS120");
     insert_CP("CS205", "CS101");
 
-    printf("lookup function on \"CS205\", \"CS120\" AFTER INSERTING IT: \n");
+    printf("lookup function on \"CS205\", \"CS120\" AFTER insertING IT: \n");
     TUPLELISTCP textbookTest2 = lookup_CP("CS205", "CS120");
     printCPTUPLEList(textbookTest2);
 
@@ -183,5 +183,26 @@ int main() {
     TUPLELISTCRDH crdh2 = select_CRDH("Turing Aud.", crdh);
     TUPLELISTDH dh = project_CRDH(crdh2);
     printDH(dh);
+
+
+
+    printf("\nNOW TESTING EXTRA CREDIT PORTION: \n");
+    RealSQL * SQL= sqlinit();
+    SQLREPL(SQL);
+
+
+    delete_CP("*", "*");
+    delete_SNAP(0, "*", "*", "*");
+    delete_CSG("*", 0, "*");
+    delete_CDH("*", "*", "*");
+    delete_CR("*", "*");
+    printf("Deleted everything from all relations now going to write data!");
+    printf("\n\nReading from file %s\n", "testWrite.txt");
+    readFile("testWrite.txt");
+
+    printf("\n\nnow going to create and write to a file");
+    printf("Writing to file %s now\n", "testWrite2.txt");
+    writeFile("testWrite2.txt");
+    printf("Open testWrite2.txt to see what was written.\n\n\n");
     return 0;
 }

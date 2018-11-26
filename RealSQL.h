@@ -136,13 +136,13 @@ bool tableExist(RealSQL * SQL, char * name) {
         return 0;
     } else {
         Table *temp = SQL->root;
-         do{
+        do{
             if (strcmp(name, temp->name) == 0) {
                 return 1;
             }
             temp = temp->nextTable;
         }while (temp != NULL);
-         return 0;
+        return 0;
         //   temp->nextTable=t;
     }
 };
@@ -179,23 +179,32 @@ bool createTable(RealSQL * SQL, char * name, attributes * attributes){
 void printSQLschema(RealSQL * SQL){
     Table * temp=SQL->root;
     do{
-          printf("Name of the Table: %s\n",SQL->root->name);
-          printAttributes(SQL->root->attributes);
-          SQL->root=SQL->root->nextTable;
+        printf("Name of the Table: %s\n",SQL->root->name);
+        printAttributes(SQL->root->attributes);
+        SQL->root=SQL->root->nextTable;
+    }while(SQL->root!=NULL);
+    SQL->root=temp;
+};
+
+void printSQLtables(RealSQL * SQL){
+    Table * temp=SQL->root;
+    do{
+        printf("Name of the Table: %s\n",SQL->root->name);
+        SQL->root=SQL->root->nextTable;
     }while(SQL->root!=NULL);
     SQL->root=temp;
 };
 
 //return the table given name as a string
 Table * returnTable(RealSQL* SQL, char * name){
-  Table* temp =SQL->root;
-  while(temp!=NULL){
-      if(strcmp(temp->name,name)==0){
-          return temp;
-      }
-      temp=temp->nextTable;
-  }
-  return NULL;
+    Table* temp =SQL->root;
+    while(temp!=NULL){
+        if(strcmp(temp->name,name)==0){
+            return temp;
+        }
+        temp=temp->nextTable;
+    }
+    return NULL;
 };
 
 int getWidthOfTable(Table * table){
@@ -221,13 +230,13 @@ node * nodeInit(Table * table){
 };
 
 int getHashid(char * firstVal){
-   int result=0;
+    int result=0;
     for (int i =0; i< strlen(firstVal); i++){
         int num = firstVal[i]-'(';
         result+=num;
-     //   printf("%d\n",result);
+        //   printf("%d\n",result);
     }
-   // printf("%d\n",result);
+    // printf("%d\n",result);
     int res= result%1009;
     return res;
 
@@ -274,7 +283,7 @@ void appendElement(node* node, char * data){
     }else if(node->properWidth<node->dataLen){
         node->readyToDeploy=-1;
     }
-   // printf("we are still good %d\n", node->readyToDeploy);
+    // printf("we are still good %d\n", node->readyToDeploy);
     if(node->hashId==NULL){
         node->hashId=getHashid(data);
     }
@@ -284,9 +293,9 @@ void appendElement(node* node, char * data){
         for(int i=1; i< node->dataLen; i++){
             temp1=temp1->next;
         }
-       //printNode(node);
+        //printNode(node);
         e->name=temp1->attr;
-       // printf("%s\n",e->name);
+        // printf("%s\n",e->name);
         if(node->head==NULL){
             node->head=e;
         }else{
@@ -298,7 +307,7 @@ void appendElement(node* node, char * data){
             node->head=temp;
         }
     }
-   // printNode(node);
+    // printNode(node);
 };
 
 
@@ -337,12 +346,13 @@ bool nodeExisted(Table * table, node* n){
 //1: insert successful
 int insertIntoTable(RealSQL * SQL, char * tableName, node * data){
     if(tableExist(SQL,tableName)==1){
-     //   printf("table exited");
+        //   printf("table exited");
         if(data->readyToDeploy!=1){
+            printf("Improper data\n");
             return -1;
         }else{
             Table * temp = returnTable(SQL, tableName);
-           // printf("%s", temp->name);
+            // printf("%s", temp->name);
             int dataHash = data->hashId;
             if(temp->data[dataHash]==NULL){
                 temp->data[data->hashId]=data;
@@ -353,7 +363,7 @@ int insertIntoTable(RealSQL * SQL, char * tableName, node * data){
                 }
                 node * tempNode= temp->data[data->hashId];
                 while(temp->data[data->hashId]->nextNode!=NULL){
-                        temp->data[data->hashId]=temp->data[data->hashId]->nextNode;
+                    temp->data[data->hashId]=temp->data[data->hashId]->nextNode;
                 }
                 temp->data[data->hashId]->nextNode=data;
                 temp->data[data->hashId]=tempNode;
@@ -362,7 +372,7 @@ int insertIntoTable(RealSQL * SQL, char * tableName, node * data){
         }
 
     }else{
-        //the table doesn't exist
+        printf("the table doesn't exist\n");
         return 0;
     }
 };
@@ -582,21 +592,21 @@ Table * SELECT(RealSQL * SQL,char * tableName, attributes * A, conditionsRoot * 
         attributes * Apointer;
         //RealSQL * SQL, char * name, attributes * attributes
         if(selectAll(A)==1){
-                //all the attributes
-               // return tempTable;
+            //all the attributes
+            // return tempTable;
             Apointer = tempTable->attributes;
         }else{
-                //projects
-                //x==1 && y==2 || z ==3
-                //make sure that attributes are entered properly
-                if(EnsureProperAttributes(tempTable, A)==1){
-                    Apointer = A;
-                }else{
-                    //improper attributes input
-                    printf("your attributes doesn't match the table\n");
-                    return NULL;
-                }
+            //projects
+            //x==1 && y==2 || z ==3
+            //make sure that attributes are entered properly
+            if(EnsureProperAttributes(tempTable, A)==1){
+                Apointer = A;
+            }else{
+                //improper attributes input
+                printf("your attributes doesn't match the table\n");
+                return NULL;
             }
+        }
         //generic loopup
         //generate result table
         Table  * resultTable = generateResultTable(tempTable, Apointer);
@@ -631,7 +641,12 @@ void dropTable(RealSQL * SQL, char * tablename){
         //drop the table
         Table * tablepointer = SQL->root;
         Table * deleteTable = returnTable(SQL,tablename);
-
+        //  printf("here");
+        if(tablepointer==deleteTable){
+            SQL->root=tablepointer->nextTable;
+            printf("%s is deleted\n", tablename);
+            return;
+        }
         while(tablepointer->nextTable!=deleteTable){
             tablepointer=tablepointer->nextTable;
         }
@@ -672,7 +687,7 @@ void appendCondition(conditionsRoot * root, char * condtopre, char * attr, char 
                 tempCon=tempCon->Lowerargs;
             }
             tempCon->Lowerargs=conditionsInit(attr,value,"AND");
-       //     while()
+            //     while()
         }else if(strcmp(condtopre,"OR")==0){
             conditions * tempCon = root->args;
             while(tempCon->Nextargs!=NULL){
